@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
+/* ------------------ ROOT THEME ------------------ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Cinematic Dark Background */
+  --background: #050507;
+  --background-soft: #0b0b12; 
+
+  /* Text */
+  --foreground: #e5e7eb;
+  --foreground-muted: #9ca3af;
+
+  /* Accent (Synibe Purple/Pink) */
+  --accent: #a855f7;
+  --accent-soft: #c084fc;
+
+  /* Borders / Cards */
+  --border: rgba(255, 255, 255, 0.08);
+  --card: rgba(255, 255, 255, 0.03);
+
+  /* Glow */
+  --glow: 168, 85, 247;
 }
 
+/* ------------------ TAILWIND THEME ------------------ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-border: var(--border);
+  --color-card: var(--card);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ------------------ BASE STYLES ------------------ */
+body {
+  background: radial-gradient(
+      circle at 20% 20%,
+      rgba(var(--glow), 0.08),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(var(--glow), 0.06),
+      transparent 50%
+    ),
+    linear-gradient(180deg, #050507 0%, #0b0b12 100%);
+    
+
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ------------------ TEXT ------------------ */
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--foreground-muted);
+}
+
+/* ------------------ CARD STYLE ------------------ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  /* border-radius: 1rem; */
+}
+
+/* ------------------ BUTTON ------------------ */
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-soft)
+  );
+  color: white;
+  border-radius: 0.75rem;
+  padding: 0.6rem 1.2rem;
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(var(--glow), 0.4);
+  transform: translateY(-1px);
+}
+
+/* ------------------ GLOW EFFECT ------------------ */
+.glow {
+  box-shadow: 0 0 40px rgba(var(--glow), 0.25);
+}
+
+/* ------------------ SCROLLBAR ------------------ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
 }
