@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
-export default function StoryTelling() {
+export default function AudioAnimation() {
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -65,7 +65,7 @@ export default function StoryTelling() {
           height: "100%",
           objectFit: "cover",
         }}
-        src="/videos/spidervid.mp4"
+        src="/videos/Listening.mp4"
         autoPlay
         loop
         muted
@@ -105,7 +105,7 @@ export default function StoryTelling() {
             lineHeight: 1,
           }}
         >
-          WATCH <br /> TOGETHER
+          Listen <br /> TOGETHER
         </div>
       </div>
     </section>
