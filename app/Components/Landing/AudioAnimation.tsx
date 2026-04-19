@@ -37,7 +37,7 @@ export default function AudioAnimation() {
         opacity: 0,
         duration: 0.4,
         ease: "power1.in",
-      }, 1.0);
+      }, 0.3);
     });
 
     return () => ctx.revert();
@@ -71,6 +71,47 @@ export default function AudioAnimation() {
         muted
         playsInline
       />
+
+      <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
+
+  <h2 className="text-xl font-semibold mb-4 tracking-wide">
+    Synced Listening
+  </h2>
+
+  <ul className="space-y-3 text-sm text-white/80">
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Perfect Audio Sync</span> — Everyone hears the same beat at the same time</p>
+    </li>
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Shared Controls</span> — Play, pause, skip together in real-time</p>
+    </li>
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Live Reactions</span> — React to drops, lyrics, and moments instantly</p>
+    </li>
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Group Queue</span> — Add songs collaboratively, no fighting over aux</p>
+    </li>
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Smart Sync Engine</span> — Stays aligned even on weak networks</p>
+    </li>
+
+    <li className="flex items-start gap-3">
+      <span>●</span>
+      <p><span className="font-medium text-white">Ambient Presence</span> — Feel like you're in the same room</p>
+    </li>
+
+  </ul>
+</div>
 
       {/* LAYER 2: Black overlay with white text */}
       {/* mix-blend-mode: multiply makes:       */}

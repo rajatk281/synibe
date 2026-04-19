@@ -28,7 +28,7 @@ export default function StoryTelling() {
       // STEP 1: Scale text from 1 → 50 (text grows, video fills screen)
       tl.to(textRef.current, {
         scale: 50,
-        duration: 1.5,
+        duration: 1,
         ease: "power2.inOut",
       }, 0);
 
@@ -37,7 +37,7 @@ export default function StoryTelling() {
         opacity: 0,
         duration: 0.4,
         ease: "power1.in",
-      }, 1.0);
+      },0.3);
     });
 
     return () => ctx.revert();
@@ -71,6 +71,46 @@ export default function StoryTelling() {
         muted
         playsInline
       />
+      <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
+
+        <h2 className="text-xl font-semibold mb-4 tracking-wide">
+          Why Synibe?
+        </h2>
+
+        <ul className="space-y-3 text-sm text-white/80">
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">Perfect Sync</span> — Zero lag playback across all users</p>
+          </li>
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">Auto Adjust Volume</span> — Auto adjust volume during watching</p>
+          </li>
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">Smart Buffering</span> — Adjusts automatically for slow networks</p>
+          </li>
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">Real-time Reactions</span> — Feel the moment together instantly</p>
+          </li>
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">No Setup Hassle</span> — Join rooms in seconds</p>
+          </li>
+
+          <li className="flex items-start gap-3">
+            <span className="">●</span>
+            <p><span className="font-medium text-white">Ultra Low Latency</span> — Built for seamless group watching</p>
+          </li>
+
+        </ul>
+      </div>
 
       {/* LAYER 2: Black overlay with white text */}
       {/* mix-blend-mode: multiply makes:       */}
