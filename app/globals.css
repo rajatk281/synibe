@@ -39,19 +39,7 @@
 
 /* ------------------ BASE STYLES ------------------ */
 body {
-  background: radial-gradient(
-      circle at 20% 20%,
-      rgba(var(--glow), 0.08),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(var(--glow), 0.06),
-      transparent 50%
-    ),
-    linear-gradient(180deg, #050507 0%, #0b0b12 100%);
-    
-
+  background: black;
   color: var(--foreground);
   font-family: var(--font-poppins), system-ui, sans-serif;
   min-height: 100vh;
@@ -107,3 +95,4 @@ p {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
+
