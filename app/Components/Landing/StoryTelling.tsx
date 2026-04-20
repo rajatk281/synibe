@@ -74,7 +74,7 @@ export default function StoryTelling() {
       <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
 
         <h2 className="text-xl font-semibold mb-4 tracking-wide">
-          Why Synibe?
+          Why use Synibe ?
         </h2>
 
         <ul className="space-y-3 text-sm text-white/80">
