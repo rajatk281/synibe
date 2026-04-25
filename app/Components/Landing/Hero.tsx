@@ -5,10 +5,10 @@ import { MessageCircle, Shield, TvMinimalPlay } from 'lucide-react';
 const Hero = () => {
   return (
     <div className='h-screen select-none'>
-      {/* <Spline
+      <Spline
         scene="https://prod.spline.design/SPTzpTCWXqcDDGF0/scene.splinecode"
-      /> */}
-      
+      />
+
       <div className='absolute h-screen w-full flex z-10 top-0'>
 
         <div className="flex flex-col w-full h-screen justify-center items-center ">
@@ -37,11 +37,11 @@ const Hero = () => {
           </div>
 
           <div className='text-sm text-slate-400 border border-slate-400 px-2 py-1 rounded-md card'>
-           <span className='bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent'>Don't wanna signup ?</span>  sync Watching and listening instantly as guest
+            <span className='bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent'>Don't wanna signup ?</span>  sync Watching and listening instantly as guest
           </div>
-          
+
         </div>
-      </div>  
+      </div>
     </div>
   )
 }
