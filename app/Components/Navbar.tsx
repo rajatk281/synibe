@@ -17,11 +17,11 @@ const navlinks = {
 
 const Navbar = () => {
     return (
-        <div className='fixed card z-50 w-full flex justify-between rounded-none text-sm'>
+        <div className='fixed card z-50 w-full flex justify-between rounded-none text-sm select-none'>
             <ul className="flex gap-4 justify-center items-center px-2">
                 <li className="p-4 font-bold text-xl">{navlinks.name}</li>
                 {navlinks.links.map((link, index) => (
-                    <li className="p-2 hover:underline underline-offset-4 hover:text-purple-400 transition-all duration-700" key={index}>
+                    <li className="p-2  hover:text-purple-400 transition-all duration-700" key={index}>
                         <Link href={link.href}>{link.name}</Link>
                     </li>
                 ))}
