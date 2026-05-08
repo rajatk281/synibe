@@ -40,7 +40,7 @@ export default function PhoneShowcase() {
 
     const ctx = gsap.context(() => {
       // Initial states
-      gsap.set(phone, { rotation: -90, x: "18vw" });
+      gsap.set(phone, { rotation: -90, x: "10vw" });
       gsap.set(c2, { opacity: 0, x: 80 });
       gsap.set(v2, { opacity: 0 });
 
@@ -60,7 +60,7 @@ export default function PhoneShowcase() {
       tl.to(c1, { opacity: 0, x: -80, duration: 0.5, ease: "power2.in" }, 1);
 
       // 1–2: Rotate phone landscape→portrait, move right→left
-      tl.to(phone, { rotation: 0, x: "-18vw", duration: 1, ease: "power3.inOut" }, 1);
+      tl.to(phone, { rotation: 0, x: "-10vw", duration: 1, ease: "power3.inOut" }, 1);
 
       // 1.2–1.8: Crossfade videos
       tl.to(v1, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 1.2);
@@ -83,7 +83,7 @@ export default function PhoneShowcase() {
       {/* ── Content 1: Video Sharing (left side) ── */}
       <div
         ref={content1Ref}
-        className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10"
+        className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10"
       >
         <div className="flex items-center gap-3 mb-4">
           <div
@@ -132,7 +132,7 @@ export default function PhoneShowcase() {
       {/* ── Phone Container ── */}
       <div
         ref={phoneRef}
-        className="absolute top-1/2 left-1/2 rounded-2xl "
+        className="absolute top-1/2 left-1/2 rounded-2xl z-10"
         style={{
           width: 400,
           height: 610,
@@ -144,7 +144,7 @@ export default function PhoneShowcase() {
       >
         {/* Screen area — inset values measured from phone.com.png pixel data */}
         <div
-          className="absolute overflow-hidden rounded-4xl mx-8"
+          className="absolute overflow-hidden rounded-4xl mx-8 "
           style={{
             top: '5.7%',
             left: '7.1%',
@@ -182,7 +182,7 @@ export default function PhoneShowcase() {
         <Image
           src="/phone.com.png"
           alt="Phone"
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          className="absolute inset-0 w-full h-full pointer-events-none z-10 "
           width={3936}
           height={6000}
           draggable={false}
@@ -192,7 +192,7 @@ export default function PhoneShowcase() {
       {/* ── Content 2: Audio Listening (right side) ── */}
       <div
         ref={content2Ref}
-        className="absolute right-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10"
+        className="absolute right-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 mr-10"
       >
         <div className="flex items-center gap-3 mb-4">
           <div
@@ -240,14 +240,14 @@ export default function PhoneShowcase() {
 
       {/* Ambient glow */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none z-0"
         style={{
           width: 600,
           height: 600,
           top: "50%",
           left: "50%",
-          transform: "translate(-50%,-50%)",
-          background: "radial-gradient(circle, rgba(var(--glow),0.06) 0%, transparent 70%)",
+          transform: "translate(-60%,-50%)",
+          background: "radial-gradient(circle, rgba(var(--glow),0.3) 0%, transparent 70%)",
         }}
       />
     </section>
