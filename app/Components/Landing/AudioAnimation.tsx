@@ -72,7 +72,7 @@ export default function AudioAnimation() {
         playsInline
       />
 
-      <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
+      {/* <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
 
   <h2 className="text-xl font-semibold mb-4 tracking-wide">
     Why use Synibe ?
@@ -111,7 +111,7 @@ export default function AudioAnimation() {
     </li>
 
   </ul>
-</div>
+</div> */}
 
       {/* LAYER 2: Black overlay with white text */}
       {/* mix-blend-mode: multiply makes:       */}

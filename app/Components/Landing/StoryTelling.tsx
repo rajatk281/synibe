@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -71,7 +72,7 @@ export default function StoryTelling() {
         muted
         playsInline
       />
-      <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
+      {/* <div className="absolute bottom-10 right-10 max-w-sm backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 text-white shadow-xl">
 
         <h2 className="text-xl font-semibold mb-4 tracking-wide">
           Why use Synibe ?
@@ -110,12 +111,13 @@ export default function StoryTelling() {
           </li>
 
         </ul>
-      </div>
+      </div> */}
 
       {/* LAYER 2: Black overlay with white text */}
       {/* mix-blend-mode: multiply makes:       */}
       {/*   black areas → stay black (hide video) */}
       {/*   white areas → show video through     */}
+      
       <div
         ref={overlayRef}
         style={{
@@ -131,6 +133,7 @@ export default function StoryTelling() {
           mixBlendMode: "multiply",
         }}
       >
+        
         {/* White text — becomes a "window" into the video */}
         <div className="text-center"
           ref={textRef}
