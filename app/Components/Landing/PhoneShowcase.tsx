@@ -144,19 +144,18 @@ export default function PhoneShowcase() {
       >
         {/* Screen area — inset values measured from phone.com.png pixel data */}
         <div
-          className="absolute overflow-hidden  mx-8"
+          className="absolute overflow-hidden rounded-4xl mx-8"
           style={{
             top: '5.7%',
             left: '7.1%',
             right: '7.1%',
             bottom: '4.3%',
-            borderRadius: '22px',
           }}
         >
           {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
           <video
             ref={video1Ref}
-            src="/videos/spidervid.mp4"
+            src="/videos/Stranger_Things.mp4"
             autoPlay
             loop
             muted
@@ -170,12 +169,12 @@ export default function PhoneShowcase() {
           {/* Video 2: portrait video, normal orientation */}
           <video
             ref={video2Ref}
-            src="/Videos/Listening.mp4"
+            src="/Videos/musicplayer.mp4"
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover "
           />
         </div>
 
