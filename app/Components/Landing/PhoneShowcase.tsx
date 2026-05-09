@@ -40,7 +40,7 @@ export default function PhoneShowcase() {
 
     const ctx = gsap.context(() => {
       // Initial states
-      gsap.set(phone, { rotation: -90, x: "10vw" });
+      gsap.set(phone, { rotation: -90, x: "18vw" });
       gsap.set(c2, { opacity: 0, x: 80 });
       gsap.set(v2, { opacity: 0 });
 
@@ -60,7 +60,7 @@ export default function PhoneShowcase() {
       tl.to(c1, { opacity: 0, x: -80, duration: 0.5, ease: "power2.in" }, 1);
 
       // 1–2: Rotate phone landscape→portrait, move right→left
-      tl.to(phone, { rotation: 0, x: "-10vw", duration: 1, ease: "power3.inOut" }, 1);
+      tl.to(phone, { rotation: 0, x: "-20vw", y:"4vh", duration: 1, ease: "power3.inOut" }, 1);
 
       // 1.2–1.8: Crossfade videos
       tl.to(v1, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 1.2);
