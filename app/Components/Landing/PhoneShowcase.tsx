@@ -49,7 +49,7 @@ export default function PhoneShowcase() {
           trigger: section,
           start: "top top",
           end: "+=350%",
-          scrub: 1.2,
+          scrub: 2,
           pin: true,
         },
       });
@@ -57,17 +57,17 @@ export default function PhoneShowcase() {
       // 0–1: Hold Section 1 (video sharing visible)
 
       // 1–1.5: Fade out content 1
-      tl.to(c1, { opacity: 0, x: -80, duration: 0.5, ease: "power2.in" }, 1);
+      tl.to(c1, { opacity: 0, x: -80, duration: 0.5, ease: "power2.in" }, 0);
 
       // 1–2: Rotate phone landscape→portrait, move right→left
-      tl.to(phone, { rotation: 0, x: "-20vw", y:"4vh", duration: 1, ease: "power3.inOut" }, 1);
+      tl.to(phone, { rotation: 0, x: "-20vw", y:"3vh", duration: 1, ease: "power3.inOut" }, 0.1);
 
       // 1.2–1.8: Crossfade videos
-      tl.to(v1, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 1.2);
-      tl.to(v2, { opacity: 1, duration: 0.6, ease: "power1.inOut" }, 1.4);
+      tl.to(v1, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 0.4);
+      tl.to(v2, { opacity: 1, duration: 0.6, ease: "power1.inOut" }, 0.6);
 
       // 1.5–2: Fade in content 2
-      tl.to(c2, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 1.5);
+      tl.to(c2, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.7);
 
       // 2–3: Hold Section 2 (audio listening visible)
     });
