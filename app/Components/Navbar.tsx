@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -9,20 +11,30 @@ const navlinks = {
         { name: "Home", href: "/" },
         { name: "How it works ", href: "/" },
         { name: "Pricing", href: "/" },
-        { name: "About", href: "/" },
-        { name: "Help", href: "/" },
-        { name: "Contact", href: "/" },
+        { name: "About", href: "/about" },
+        { name: "Help", href: "/help" },
+        { name: "Contact", href: "/contact" },
     ]
 }
 
 const Navbar = () => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        if (href.startsWith("#")) {
+            e.preventDefault();
+            const el = document.querySelector(href);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+    };
+
     return (
         <div className='fixed card z-50 w-full flex justify-between rounded-none text-sm select-none'>
             <ul className="flex gap-4 justify-center items-center px-2">
                 <li className="p-4 font-bold text-xl">{navlinks.name}</li>
                 {navlinks.links.map((link, index) => (
                     <li className="p-2  hover:text-purple-400 transition-all duration-700" key={index}>
-                        <Link href={link.href}>{link.name}</Link>
+                        <Link href={link.href} onClick={(e) => handleClick(e, link.href)}>{link.name}</Link>
                     </li>
                 ))}
             </ul>

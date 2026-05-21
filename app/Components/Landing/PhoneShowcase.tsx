@@ -49,7 +49,7 @@ export default function PhoneShowcase() {
           trigger: section,
           start: "top top",
           end: "+=350%",
-          scrub: 2,
+          scrub: 0,
           pin: true,
         },
       });
