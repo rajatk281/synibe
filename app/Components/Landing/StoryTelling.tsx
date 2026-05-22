@@ -66,7 +66,7 @@ export default function StoryTelling() {
           height: "100%",
           objectFit: "cover",
         }}
-        src="/videos/spidervid.mp4"
+        src="/Videos/musicplayer.mp4"
         autoPlay
         loop
         muted

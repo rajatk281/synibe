@@ -65,7 +65,7 @@ export default function AudioAnimation() {
           height: "100%",
           objectFit: "cover",
         }}
-        src="/videos/Listening.mp4"
+        src="/Videos/musicplayer.mp4"
         autoPlay
         loop
         muted
