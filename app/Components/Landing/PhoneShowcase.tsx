@@ -155,7 +155,7 @@ export default function PhoneShowcase() {
           {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
           <video
             ref={video1Ref}
-            src="/videos/Stranger_Things.mp4"
+            src="/Videos/musicplayer.mp4"
             autoPlay
             loop
             muted
