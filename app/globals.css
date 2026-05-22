@@ -96,3 +96,40 @@ p {
   border-radius: 10px;
 }
 
+/* ------------------ FLOAT ANIMATIONS ------------------ */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(12deg); }
+  50% { transform: translateY(-12px) rotate(12deg); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* ------------------ CARD REVEAL ANIMATIONS ------------------ */
+.card-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-reveal.card-reveal-delayed {
+  transition-delay: 0.15s;
+}
+
+.card-reveal.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+

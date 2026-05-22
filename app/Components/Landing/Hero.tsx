@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Spline from '@splinetool/react-spline/next';
 import { MessageCircle, Shield, TvMinimalPlay } from 'lucide-react';
+import Link from 'next/link';
 
 const Hero = () => {
   return (
@@ -26,7 +27,7 @@ const Hero = () => {
           </p>
 
           <div className='flex gap-4 p-4'>
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5">Start Watching</Button>
+            <Link href="/create-room"><Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5">Start Watching</Button></Link>
             <Button className='border-2 border-gray-500 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5'>Join Room</Button>
           </div>
 

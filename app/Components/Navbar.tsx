@@ -45,7 +45,7 @@ const Navbar = () => {
                     <AvatarImage className="" src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar></li>
-                <li className="p-2"><Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer">Start Watching</Button></li>
+                <li className="p-2"><Link href="/create-room"><Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer">Start Watching</Button></Link></li>
             </ul>
         </div>
     )
