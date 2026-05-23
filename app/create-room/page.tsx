@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { Play, ArrowRight, AudioLines, PlusCircle, LogIn, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function CreateRoomPage() {
   const watchCardRef = useRef<HTMLDivElement>(null);
@@ -167,14 +168,14 @@ export default function CreateRoomPage() {
                 rhythm, miles apart but in the same frequency.
               </p>
 
-              <Link
-                href="#"
+              <Button
+              onClick={() => setShowStreamModal(true)}
                 id="open-sonic-portal-btn"
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.1em] hover:text-orange-300 transition-colors duration-300 group/link"
               >
                 Open Sonic Portal
                 <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform duration-300" />
-              </Link>
+              </Button>
             </div>
           </div>
         </div>

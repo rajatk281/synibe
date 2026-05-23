@@ -163,3 +163,13 @@ p {
   opacity: 0;
 }
 
+/* ------------------ JOIN MASCOT FLOAT ------------------ */
+@keyframes join-mascot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.join-mascot-float {
+  animation: join-mascot-float 3.5s ease-in-out infinite;
+}
+

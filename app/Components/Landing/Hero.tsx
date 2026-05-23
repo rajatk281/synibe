@@ -28,7 +28,7 @@ const Hero = () => {
 
           <div className='flex gap-4 p-4'>
             <Link href="/create-room"><Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5">Start Watching</Button></Link>
-            <Button className='border-2 border-gray-500 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5'>Join Room</Button>
+            <Link href="/create-room/join"><Button className='border-2 border-gray-500 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5'>Join Room</Button></Link>
           </div>
 
           <div className=' flex gap-8 text-sm font-light py-4'>
