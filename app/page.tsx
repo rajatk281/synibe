@@ -6,6 +6,7 @@ import StoryTelling from './Components/Landing/StoryTelling'
 import AudioAnimation from './Components/Landing/AudioAnimation'
 import HowItWorks from './Components/Landing/HowItWorks'
 import FAQ from './Components/Landing/FAQ'
+import Footer from './Components/Footer'
 
 const page = () => {
   return (
@@ -17,6 +18,7 @@ const page = () => {
       <AudioAnimation/>
       <HowItWorks/>
       <FAQ/>
+      <Footer/>
     </div>
   )
 }
