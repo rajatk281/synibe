@@ -9,7 +9,7 @@ const navlinks = {
     name: "Synibe",
     links: [
         { name: "Home", href: "/" },
-        { name: "How it works ", href: "/" },
+        { name: "How it works ", href: "/#how-it-works" },
         { name: "Pricing", href: "/pricing" },
         { name: "About", href: "/about" },
         { name: "Help", href: "/help" },
@@ -19,12 +19,20 @@ const navlinks = {
 
 const Navbar = () => {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        if (href.startsWith("#")) {
-            e.preventDefault();
-            const el = document.querySelector(href);
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
+        const hashIndex = href.indexOf("#");
+        if (hashIndex !== -1) {
+            const path = href.substring(0, hashIndex) || "/";
+            const hash = href.substring(hashIndex);
+
+            // If we're already on the target page, smooth-scroll to the section
+            if (window.location.pathname === path) {
+                e.preventDefault();
+                const el = document.querySelector(hash);
+                if (el) {
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
             }
+            // Otherwise, let Next.js navigate — the browser will auto-scroll to the anchor
         }
     };
 
