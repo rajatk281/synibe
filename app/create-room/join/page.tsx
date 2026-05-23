@@ -1,11 +1,15 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Lock, ShieldCheck } from "lucide-react";
 
 export default function JoinRoomPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode") || "watch";
   const [code, setCode] = useState(["", "", "", "", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [isJoining, setIsJoining] = useState(false);
@@ -56,8 +60,15 @@ export default function JoinRoomPage() {
   const handleJoin = () => {
     if (!isComplete) return;
     setIsJoining(true);
-    // Simulate join action
-    setTimeout(() => setIsJoining(false), 2000);
+    // Simulate join handshake, then navigate to the correct room type
+    setTimeout(() => {
+      const roomId = fullCode.toLowerCase();
+      if (mode === "listen") {
+        router.push(`/room/listen/${roomId}`);
+      } else {
+        router.push(`/room/${roomId}`);
+      }
+    }, 1500);
   };
 
   return (

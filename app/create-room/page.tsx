@@ -9,6 +9,12 @@ export default function CreateRoomPage() {
   const watchCardRef = useRef<HTMLDivElement>(null);
   const listenCardRef = useRef<HTMLDivElement>(null);
   const [showStreamModal, setShowStreamModal] = useState(false);
+  const [streamMode, setStreamMode] = useState<"watch" | "listen">("watch");
+
+  const openModal = (mode: "watch" | "listen") => {
+    setStreamMode(mode);
+    setShowStreamModal(true);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -39,15 +45,15 @@ export default function CreateRoomPage() {
   }, [showStreamModal]);
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div className="h-screen bg-black relative overflow-hidden ">
       {/* Subtle ambient glow */}
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-amber-600/5 rounded-full blur-[180px] pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-32 pb-20">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-10 pb-20 ">
         {/* Section label */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6 ">
           <div className="w-12 h-px bg-gradient-to-r from-orange-500 to-transparent" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.2em] ">
             Act II: Connection
@@ -55,7 +61,7 @@ export default function CreateRoomPage() {
         </div>
 
         {/* Main heading */}
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-16 max-w-2xl">
+        <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-[1.05] tracking-tight mb-16 max-w-2xl">
           What do you want to{" "}
           <br />
           <em className="not-italic bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent italic">
@@ -102,7 +108,7 @@ export default function CreateRoomPage() {
 
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setShowStreamModal(true)}
+                  onClick={() => openModal("watch")}
                   id="initiate-stream-btn"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg text-xs font-bold uppercase tracking-[0.1em] text-white hover:from-pink-500 hover:to-purple-500 shadow-lg shadow-orange-600/20 hover:shadow-orange-500/30 hover:scale-105 transition-all duration-300 cursor-pointer"
                 >
@@ -121,7 +127,7 @@ export default function CreateRoomPage() {
           {/* ── Listen Together Card ── */}
           <div
             ref={listenCardRef}
-            className="group card-reveal card-reveal-delayed relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#0a0a0a] hover:border-orange-500/20 transition-all duration-700 lg:mt-24"
+            className="group card-reveal card-reveal-delayed relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#0a0a0a] hover:border-pink-500/20 transition-all duration-700"
           >
             {/* Waveform visual area */}
             <div className="relative h-48 overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#0f0f0f] to-[#0a0a0a]">
@@ -156,7 +162,7 @@ export default function CreateRoomPage() {
             </div>
 
             {/* Card content */}
-            <div className="relative p-6 pt-2 -mt-4">
+            <div className="relative p-6 pt-2 -mt-4 ">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block">
                 World 02
               </span>
@@ -169,7 +175,7 @@ export default function CreateRoomPage() {
               </p>
 
               <Button
-              onClick={() => setShowStreamModal(true)}
+                onClick={() => openModal("listen")}
                 id="open-sonic-portal-btn"
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.1em] hover:text-orange-300 transition-colors duration-300 group/link"
               >
@@ -197,7 +203,7 @@ export default function CreateRoomPage() {
           {/* Large faded background text */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
             <div className="text-[12vw] md:text-[10vw] font-black uppercase leading-none tracking-tighter text-white/[0.03] text-center whitespace-nowrap">
-              WATCH
+              {streamMode === "watch" ? "WATCH" : "LISTEN"}
               <br />
               TOGETHER.
             </div>
@@ -218,7 +224,7 @@ export default function CreateRoomPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
               {/* ── Create a Room ── */}
               <Link
-                href="/create-room/new"
+                href={`/create-room/new?mode=${streamMode}`}
                 id="create-room-option"
                 className="group flex flex-col items-center text-center"
               >
@@ -244,7 +250,7 @@ export default function CreateRoomPage() {
 
               {/* ── Join a Room ── */}
               <Link
-                href="/create-room/join"
+                href={`/create-room/join?mode=${streamMode}`}
                 id="join-room-option"
                 className="group flex flex-col items-center text-center"
               >

@@ -1,0 +1,379 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import {
+  Play,
+  Pause,
+  Maximize2,
+  Settings,
+  LayoutGrid,
+  Users,
+  Smile,
+  Send,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+
+/* ── Fake chat data ── */
+const INITIAL_MESSAGES = [
+  {
+    id: 1,
+    user: "ALIX_VOID",
+    avatar: "/avatar_cat.png",
+    text: "That transition was actually insane! Did you see the reflection on the visor? 🤯",
+    side: "left" as const,
+    time: "2m ago",
+  },
+  {
+    id: 2,
+    user: "YOU",
+    avatar: "/wolf_avatar.png",
+    text: "Wait for the 1:30 mark... trust me.",
+    side: "right" as const,
+    time: "1m ago",
+  },
+  {
+    id: 3,
+    user: "NEON_GHOST",
+    avatar: "/avatar_unicorn.png",
+    text: "Ready. 💜🔥",
+    side: "left" as const,
+    time: "now",
+  },
+];
+
+const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
+
+export default function RoomPage() {
+  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const [newMsg, setNewMsg] = useState("");
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(35);
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [activeReaction, setActiveReaction] = useState<string | null>(null);
+  const [viewerCount] = useState(1204);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Auto-scroll chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Progress bar simulation
+  useEffect(() => {
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 0 : p + 0.05));
+    }, 100);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  const sendMessage = () => {
+    if (!newMsg.trim()) return;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        user: "YOU",
+        avatar: "/wolf_avatar.png",
+        text: newMsg,
+        side: "right" as const,
+        time: "now",
+      },
+    ]);
+    setNewMsg("");
+  };
+
+  const triggerReaction = (emoji: string) => {
+    setActiveReaction(emoji);
+    setTimeout(() => setActiveReaction(null), 1200);
+  };
+
+  const togglePlay = () => {
+    setIsPlaying((p) => !p);
+    if (videoRef.current) {
+      isPlaying ? videoRef.current.pause() : videoRef.current.play();
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted((m) => !m);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
+
+  return (
+    <div className="h-screen bg-[#060612] flex overflow-hidden">
+      {/* ═══════════════════════════════════════════════ */}
+      {/*  LEFT — Video Player Area                      */}
+      {/* ═══════════════════════════════════════════════ */}
+      <div className="flex-1 flex flex-col relative">
+        {/* Video container */}
+        <div className="flex-1 relative overflow-hidden bg-black">
+          {/* Video / Background Image */}
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/Videos/Stranger_Things.mp4"
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+          />
+
+          {/* Top overlay gradient */}
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10" />
+
+          {/* Bottom overlay gradient */}
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060612] via-[#060612]/60 to-transparent z-10" />
+
+          {/* ── Top-left: Title & viewers ── */}
+          <div className="absolute top-5 left-5 z-20">
+            <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+              <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                Neon Nights
+              </span>{" "}
+              <span className="text-white/60 font-normal">Ep. 04</span>
+            </h2>
+            <div className="flex items-center gap-1.5 mt-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
+              <span className="text-[10px] font-semibold text-white/50 tracking-wider uppercase">
+                {viewerCount.toLocaleString()} watching
+              </span>
+            </div>
+          </div>
+
+          {/* ── Floating emoji reaction ── */}
+          {activeReaction && (
+            <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30 text-6xl room-reaction-float pointer-events-none">
+              {activeReaction}
+            </div>
+          )}
+
+          {/* ── Bottom controls ── */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 px-5 pb-4">
+            {/* Emoji reaction bar */}
+            <div className="flex items-center justify-center mb-3">
+              <div className="flex items-center gap-1 px-4 py-2 rounded-full bg-white/[0.08] backdrop-blur-xl border border-white/[0.06]">
+                {EMOJI_REACTIONS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => triggerReaction(emoji)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.1] hover:scale-125 transition-all duration-200 text-lg cursor-pointer"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="relative w-full h-1 bg-white/[0.08] rounded-full overflow-hidden group cursor-pointer mb-3">
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
+                style={{ width: `${progress}%` }}
+              />
+              {/* Hover scrub indicator */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg shadow-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ left: `${progress}%`, transform: `translate(-50%, -50%)` }}
+              />
+            </div>
+
+            {/* Controls row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  id="play-pause-btn"
+                  onClick={togglePlay}
+                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-4 h-4" />
+                  ) : (
+                    <Play className="w-4 h-4 ml-0.5" />
+                  )}
+                </button>
+                <button
+                  id="mute-btn"
+                  onClick={toggleMute}
+                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                >
+                  {isMuted ? (
+                    <VolumeX className="w-4 h-4" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
+                </button>
+                <span className="text-[11px] font-medium text-white/40 tracking-wide tabular-nums">
+                  12:47 / 36:20
+                </span>
+              </div>
+              <button
+                id="fullscreen-btn"
+                className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════ */}
+      {/*  RIGHT — Chat Panel                            */}
+      {/* ═══════════════════════════════════════════════ */}
+      <div className="w-[340px] lg:w-[380px] flex flex-col bg-[#0a0a14] border-l border-white/[0.06]">
+        {/* Chat header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-purple-400" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+              Live Chat
+            </span>
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">
+              3 Online
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              id="chat-layout-btn"
+              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+            <button
+              id="chat-settings-btn"
+              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Chat messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex gap-2.5 ${msg.side === "right" ? "flex-row-reverse" : ""} room-msg-appear`}
+            >
+              {/* Avatar */}
+              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/[0.08] flex-shrink-0 mt-1">
+                <Image
+                  src={msg.avatar}
+                  alt={msg.user}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Bubble */}
+              <div
+                className={`max-w-[75%] ${
+                  msg.side === "right" ? "items-end" : "items-start"
+                } flex flex-col`}
+              >
+                {msg.side === "left" && (
+                  <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-1 ml-1">
+                    {msg.user}
+                  </span>
+                )}
+                <div
+                  className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
+                    msg.side === "right"
+                      ? "bg-gradient-to-br from-purple-600/30 to-pink-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
+                      : "bg-white/[0.05] text-white/80 rounded-tl-md border border-white/[0.06]"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+                <span className="text-[9px] text-white/20 mt-1 mx-1 font-medium">
+                  {msg.time}
+                </span>
+              </div>
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Chat input */}
+        <div className="px-4 py-3 border-t border-white/[0.06]">
+          <div className="flex items-center gap-2 bg-white/[0.04] rounded-xl border border-white/[0.06] px-3 py-2 focus-within:border-purple-500/30 transition-all duration-300">
+            <button
+              id="emoji-picker-btn"
+              onClick={() => setShowEmojis(!showEmojis)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-purple-400 hover:bg-purple-500/[0.06] transition-all duration-300 cursor-pointer"
+            >
+              <Smile className="w-4 h-4" />
+            </button>
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Send a reaction..."
+              value={newMsg}
+              onChange={(e) => setNewMsg(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              className="flex-1 bg-transparent text-sm text-white placeholder-white/20 outline-none font-medium"
+            />
+            <button
+              id="send-msg-btn"
+              onClick={sendMessage}
+              className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/20 cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Quick emoji picker */}
+          {showEmojis && (
+            <div className="mt-2 flex items-center gap-1 flex-wrap px-1 room-emojis-appear">
+              {["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬", "😮", "🥺", "💯", "🫡"].map(
+                (emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => {
+                      setNewMsg((prev) => prev + emoji);
+                      setShowEmojis(false);
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/[0.08] transition-all duration-200 text-base cursor-pointer"
+                  >
+                    {emoji}
+                  </button>
+                )
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom mascot peek */}
+        <div className="relative h-16 overflow-hidden">
+          <div className="absolute -bottom-4 left-4">
+            <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-white/[0.06]">
+              <Image
+                src="/wolf_avatar.png"
+                alt="Your character"
+                fill
+                className="object-cover opacity-50"
+              />
+            </div>
+          </div>
+          <div className="absolute -bottom-4 right-4">
+            <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-white/[0.06]">
+              <Image
+                src="/avatar_unicorn.png"
+                alt="Guest character"
+                fill
+                className="object-cover opacity-50"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

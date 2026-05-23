@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
 
 function generateAccessHash() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -13,10 +14,27 @@ function generateAccessHash() {
 }
 
 export default function NewRoomPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode") || "watch";
   const [roomName, setRoomName] = useState("");
   const [accessHash, setAccessHash] = useState("SNB-992-X");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [participants, setParticipants] = useState(12);
+  const [isDeploying, setIsDeploying] = useState(false);
+
+  const handleDeploy = () => {
+    setIsDeploying(true);
+    // Simulate room deployment, then navigate to the correct room type
+    setTimeout(() => {
+      const roomId = accessHash.replace(/-/g, "").toLowerCase();
+      if (mode === "listen") {
+        router.push(`/room/listen/${roomId}`);
+      } else {
+        router.push(`/room/${roomId}`);
+      }
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -192,10 +210,25 @@ export default function NewRoomPage() {
             {/* Deploy Room button */}
             <button
               id="deploy-room-btn"
-              className="w-full py-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-sm font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 hover:from-purple-500 hover:via-pink-500 hover:to-purple-500 shadow-xl shadow-purple-600/15 hover:shadow-purple-500/25 hover:scale-[1.02] transition-all duration-500 cursor-pointer"
+              onClick={handleDeploy}
+              disabled={isDeploying}
+              className={`w-full py-5 rounded-2xl text-white text-sm font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 shadow-xl transition-all duration-500 cursor-pointer ${
+                isDeploying
+                  ? "bg-gradient-to-r from-purple-800 via-pink-800 to-purple-800 shadow-purple-800/15"
+                  : "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 shadow-purple-600/15 hover:from-purple-500 hover:via-pink-500 hover:to-purple-500 hover:shadow-purple-500/25 hover:scale-[1.02]"
+              }`}
             >
-              Deploy Room
-              <ArrowRight className="w-4 h-4" />
+              {isDeploying ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Deploying Room...
+                </>
+              ) : (
+                <>
+                  Deploy Room
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </div>
