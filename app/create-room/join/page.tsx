@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { Suspense, useRef, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, ShieldCheck } from "lucide-react";
 
-export default function JoinRoomPage() {
+function JoinRoomContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "watch";
@@ -206,5 +205,19 @@ export default function JoinRoomPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function JoinRoomPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen bg-black flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <JoinRoomContent />
+    </Suspense>
   );
 }

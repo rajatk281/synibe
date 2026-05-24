@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
@@ -13,7 +13,7 @@ function generateAccessHash() {
   return `${seg1}-${seg2}-${seg3}`;
 }
 
-export default function NewRoomPage() {
+function NewRoomContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "watch";
@@ -234,5 +234,19 @@ export default function NewRoomPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NewRoomPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen bg-black flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <NewRoomContent />
+    </Suspense>
   );
 }

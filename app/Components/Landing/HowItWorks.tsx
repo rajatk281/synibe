@@ -112,7 +112,6 @@ const HowItWorks = () => {
 
   return (
     <section
-      id="how-it-works"
       ref={sectionRef}
       className="relative w-full h-screen overflow-hidden bg-black"
     >

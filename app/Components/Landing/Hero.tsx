@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
+// "use client"
 import Spline from '@splinetool/react-spline/next';
 import { MessageCircle, Shield, TvMinimalPlay } from 'lucide-react';
-import Link from 'next/link';
-
+import { Session } from '../session-provider';
 const Hero = () => {
+  
   return (
     <div className='h-screen select-none'>
       <Spline
@@ -25,12 +25,7 @@ const Hero = () => {
             Sync your favorite films, series and songs with anyone, anywhere. <br />
             High-fidelity streaming meet human connection.
           </p>
-
-          <div className='flex gap-4 p-4'>
-            <Link href="/create-room"><Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5">Start Watching</Button></Link>
-            <Link href="/create-room/join"><Button className='border-2 border-gray-500 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5'>Join Room</Button></Link>
-          </div>
-
+          <Session/>
           <div className=' flex gap-8 text-sm font-light py-4'>
             <span className='flex gap-2 items-center text-slate-400 card px-2 py-1 rounded-md'> <TvMinimalPlay className='size-4' /> 4K Crystal Clarity</span>
             <span className='flex gap-2 items-center text-slate-400 card px-2 py-1 rounded-md'> <Shield className='size-4' /> Private Syncing </span>
