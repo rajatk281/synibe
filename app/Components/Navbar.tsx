@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Search, User, Settings } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Google from "next-auth/providers/google";
 
 const navlinks = {
   name: "Synibe",
@@ -108,7 +109,7 @@ const Navbar = () => {
 
                 {/* Menu Items */}
                 <div className="py-2">
-                  <button
+                  {/* <button
                     onClick={() => {
                       setIsMenuOpen(false);
                     }}
@@ -116,8 +117,8 @@ const Navbar = () => {
                   >
                     <User size={16} />
                     <span>Profile</span>
-                  </button>
-                  <button
+                  </button> */}
+                  {/* <button
                     onClick={() => {
                       setIsMenuOpen(false);
                     }}
@@ -125,7 +126,7 @@ const Navbar = () => {
                   >
                     <Settings size={16} />
                     <span>Settings</span>
-                  </button>
+                  </button> */}
                 </div>
 
                 {/* Logout */}
@@ -147,19 +148,19 @@ const Navbar = () => {
         ) : (
           <Button
             className="bg-white text-black"
-            onClick={() => signIn(undefined, { callbackUrl: "/" })}
+            onClick={() => signIn(undefined , { callbackUrl: "/" })}
           >
             Sign In
           </Button>
         )}
 
-        <li className="p-2">
+        {/* <li className="p-2">
           <Link href="/create-room">
             <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer">
               Start Watching
             </Button>
           </Link>
-        </li>
+        </li> */}
       </ul>
     </div>
   );
