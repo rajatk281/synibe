@@ -327,6 +327,45 @@ export default function PricingSection() {
     return isAnnual ? Math.round(num * 0.8).toString() : base;
   };
 
+
+  const createOrder = async(amount : String )=>{
+    if (Number(amount) === 0) return; // Free plan, no payment needed
+
+    const res = await fetch("/api/CreateOrder",  {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({amount})
+    })
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("CreateOrder failed:", res.status, errorText);
+      return;
+    }
+    const data = await res.json()
+
+    if (!(window as any).Razorpay) {
+      console.error("Razorpay SDK not loaded");
+      return;
+    }
+
+    const paymentData = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: data.amount,
+      currency: data.currency,
+      name: "Synibe",
+      description: "Subscription Payment",
+      order_id : data.id,
+      handler : async function(response: any ){
+        // verify payment 
+      },
+      theme: {
+        color: "#a855f7"
+      }
+    }
+    const payment = new (window as any).Razorpay(paymentData)
+    payment.open()
+  }
+
   return (
     <div className="relative w-full bg-black overflow-hidden">
       {/* ═══════════════ HERO ═══════════════ */}
@@ -596,7 +635,7 @@ export default function PricingSection() {
                   </div>
 
                   {/* CTA Button */}
-                  <div className="mt-8">
+                  <div onClick={()=>{createOrder(plan.price)}} className="mt-8 border">
                     <Link
                       href={plan.id === "enterprise" ? "/contact" : "#"}
                       className={`group/btn w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-[1.03] ${plan.popular ? "text-white" : "text-white/70 hover:text-white"}`}
@@ -613,7 +652,7 @@ export default function PricingSection() {
                       }
                     >
                       {plan.cta}
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300 " />
                     </Link>
                   </div>
                 </div>
