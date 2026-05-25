@@ -356,7 +356,30 @@ export default function PricingSection() {
       description: "Subscription Payment",
       order_id : data.id,
       handler : async function(response: any ){
-        // verify payment 
+        try {
+          const res = await fetch("/api/auth/verifyOrder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            }),
+          });
+          
+          const data = await res.json();
+          if (data.isOk) {
+            console.log("Payment verification successful");
+            // Add your success logic here (e.g. redirect, toast notification)
+            alert("Payment successful!");
+          } else {
+            console.error("Payment verification failed:", data.message);
+            alert("Payment verification failed.");
+          }
+        } catch (error) {
+          console.error("Error verifying payment:", error);
+          alert("Something went wrong during payment verification.");
+        }
       },
       theme: {
         color: "#a855f7"
