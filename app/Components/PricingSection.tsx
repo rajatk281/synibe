@@ -492,7 +492,7 @@ export default function PricingSection() {
       </section>
 
       {/* ═══════════════ PRICING CARDS ═══════════════ */}
-      <section className="relative w-full pb-28">
+      <section className="relative w-full pb-18">
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             {plans.map((plan, i) => {
@@ -635,7 +635,7 @@ export default function PricingSection() {
                   </div>
 
                   {/* CTA Button */}
-                  <div onClick={()=>{createOrder(plan.price)}} className="mt-8 border">
+                  <div onClick={()=>{createOrder(plan.price)}} className="mt-8 ">
                     <Link
                       href={plan.id === "enterprise" ? "/contact" : "#"}
                       className={`group/btn w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-[1.03] ${plan.popular ? "text-white" : "text-white/70 hover:text-white"}`}
@@ -663,7 +663,7 @@ export default function PricingSection() {
       </section>
 
       {/* ═══════════════ PERKS ═══════════════ */}
-      <section className="relative w-full py-24">
+      <section className="relative w-full pb-12">
         <div
           className="absolute pointer-events-none"
           style={{
@@ -751,7 +751,7 @@ export default function PricingSection() {
       </section>
 
       {/* ═══════════════ COMPARISON TABLE ═══════════════ */}
-      <section className="relative w-full py-28">
+      <section className="relative w-full pb-12">
         <div
           className="absolute pointer-events-none"
           style={{
@@ -868,11 +868,11 @@ export default function PricingSection() {
       </section>
 
       {/* ═══════════════ FAQ ═══════════════ */}
-      <section className="relative w-full py-28">
+      <section className="relative w-full">
         <div
           className="absolute pointer-events-none"
           style={{
-            width: 600,
+            width: 800,
             height: 600,
             bottom: "10%",
             left: "10%",
@@ -880,7 +880,7 @@ export default function PricingSection() {
           }}
         />
 
-        <div className="relative z-10 max-w-3xl mx-auto px-6">
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div ref={faqHeaderRef} style={{ opacity: 0 }}>
             <div className="flex items-center gap-3 mb-6">
               <div
@@ -950,7 +950,7 @@ export default function PricingSection() {
       </section>
 
       {/* ═══════════════ CTA ═══════════════ */}
-      <section className="relative w-full py-28">
+      <section className="relative w-full">
         <div ref={ctaRef} className="relative z-10 max-w-5xl mx-auto px-6" style={{ opacity: 0 }}>
           <div
             className="relative rounded-3xl p-10 sm:p-16 overflow-hidden text-center"
