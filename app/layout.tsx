@@ -1,3 +1,5 @@
+
+
 import type { Metadata } from "next";
 import { Poppins, Geist } from "next/font/google";
 import "./globals.css";
@@ -29,7 +31,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", poppins.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col">
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Provider>{children}</Provider></body>
     </html>
   );

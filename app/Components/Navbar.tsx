@@ -12,7 +12,7 @@ const navlinks = {
   name: "Synibe",
   links: [
     { name: "Home", href: "/" },
-    { name: "How it works ", href: "/" },
+    { name: "How it works ", href: "/#how-it-works" },
     { name: "Pricing", href: "/pricing" },
     { name: "About", href: "/about" },
     { name: "Help", href: "/help" },

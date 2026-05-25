@@ -17,6 +17,8 @@ import {
   Shield,
   Infinity,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -327,8 +329,16 @@ export default function PricingSection() {
     return isAnnual ? Math.round(num * 0.8).toString() : base;
   };
 
+  const {data: session} = useSession();
+  const router = useRouter();
 
-  const createOrder = async(amount : String )=>{
+ const createOrder = async(amount : String , session: any)=>{
+
+  if (!session){
+    router.push("/signin")
+    return;
+  }
+   
     if (Number(amount) === 0) return; // Free plan, no payment needed
 
     const res = await fetch("/api/CreateOrder",  {
@@ -386,16 +396,15 @@ export default function PricingSection() {
       }
     }
     const payment = new (window as any).Razorpay(paymentData)
-    payment.open()
-  }
+    payment.open()}
 
   return (
-    <div className="relative w-full bg-black overflow-hidden">
+    <div className="relative w-full bg-black overflow-hidden select-none">
       {/* ═══════════════ HERO ═══════════════ */}
       <section className="relative w-full pt-32 pb-10 overflow-hidden">
         {/* Ambient glows */}
         <div
-          className="absolute pointer-events-none"
+          className="absolute pointer-events-none"  
           style={{
             width: 900,
             height: 900,
@@ -658,9 +667,8 @@ export default function PricingSection() {
                   </div>
 
                   {/* CTA Button */}
-                  <div onClick={()=>{createOrder(plan.price)}} className="mt-8 ">
-                    <Link
-                      href={plan.id === "enterprise" ? "/contact" : "#"}
+                  <div onClick={()=>{createOrder(plan.price, session)}} className="mt-8 cursor-pointer">
+                    <div
                       className={`group/btn w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-[1.03] ${plan.popular ? "text-white" : "text-white/70 hover:text-white"}`}
                       style={
                         plan.popular
@@ -676,7 +684,7 @@ export default function PricingSection() {
                     >
                       {plan.cta}
                       <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300 " />
-                    </Link>
+                    </div>
                   </div>
                 </div>
               );
