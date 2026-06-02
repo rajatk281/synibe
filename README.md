@@ -241,24 +241,6 @@ Configure:
 
 Then deploy.
 
----
-
-# 📸 Screenshots
-
-Add screenshots here.
-
-```md
-<img width="1919" height="865" alt="image" src="https://github.com/user-attachments/assets/f58332ee-979d-4884-a793-d5ce318f9e51" />
-
-<img width="1919" height="761" alt="image" src="https://github.com/user-attachments/assets/7eccb54d-b10c-45b8-8c1f-aa6a25026de7" />
-
-<img width="1919" height="772" alt="image" src="https://github.com/user-attachments/assets/9fd61b65-c076-45b9-9ca5-6716a7d80d91" />
-
-
-
-```
-
----
 
 # 🤝 Contributing
 
