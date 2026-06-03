@@ -4,6 +4,9 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
+// import { Session } from "@/app/Components/session-provider";
+import { useSession } from "next-auth/react";
+import { createRoom } from "./actions";
 
 function generateAccessHash() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -23,7 +26,19 @@ function NewRoomContent() {
   const [participants, setParticipants] = useState(12);
   const [isDeploying, setIsDeploying] = useState(false);
 
-  const handleDeploy = () => {
+  const{ data: session} = useSession()
+  const handleDeploy = async () => {
+    
+    await createRoom({
+      destName: roomName,
+      accessHash: accessHash,
+      visibility: visibility,
+      participantLimit: participants,
+      creatorId: session?.user?.id!
+    });
+
+    alert("Room creation data saved successfully")
+
     setIsDeploying(true);
     // Simulate room deployment, then navigate to the correct room type
     setTimeout(() => {
@@ -119,6 +134,7 @@ function NewRoomContent() {
                   <button
                     id="refresh-hash-btn"
                     onClick={() => setAccessHash(generateAccessHash())}
+                    value={accessHash}
                     className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20 transition-all duration-300 cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
@@ -135,22 +151,20 @@ function NewRoomContent() {
                   <button
                     id="visibility-public"
                     onClick={() => setVisibility("public")}
-                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 cursor-pointer ${
-                      visibility === "public"
+                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 cursor-pointer ${visibility === "public"
                         ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/20"
                         : "bg-white/[0.03] text-slate-500 border border-white/[0.08] hover:bg-white/[0.06]"
-                    }`}
+                      }`}
                   >
                     Public
                   </button>
                   <button
                     id="visibility-private"
                     onClick={() => setVisibility("private")}
-                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 cursor-pointer ${
-                      visibility === "private"
+                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-[0.1em] transition-all duration-300 cursor-pointer ${visibility === "private"
                         ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/20"
                         : "bg-white/[0.03] text-slate-500 border border-white/[0.08] hover:bg-white/[0.06]"
-                    }`}
+                      }`}
                   >
                     Private
                   </button>
@@ -212,11 +226,10 @@ function NewRoomContent() {
               id="deploy-room-btn"
               onClick={handleDeploy}
               disabled={isDeploying}
-              className={`w-full py-5 rounded-2xl text-white text-sm font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 shadow-xl transition-all duration-500 cursor-pointer ${
-                isDeploying
+              className={`w-full py-5 rounded-2xl text-white text-sm font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 shadow-xl transition-all duration-500 cursor-pointer ${isDeploying
                   ? "bg-gradient-to-r from-purple-800 via-pink-800 to-purple-800 shadow-purple-800/15"
                   : "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 shadow-purple-600/15 hover:from-purple-500 hover:via-pink-500 hover:to-purple-500 hover:shadow-purple-500/25 hover:scale-[1.02]"
-              }`}
+                }`}
             >
               {isDeploying ? (
                 <>
