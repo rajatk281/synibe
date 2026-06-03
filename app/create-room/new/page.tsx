@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
@@ -21,14 +21,17 @@ function NewRoomContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "watch";
   const [roomName, setRoomName] = useState("");
-  const [accessHash, setAccessHash] = useState("SNB-992-X");
+  const [accessHash, setAccessHash] = useState("");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [participants, setParticipants] = useState(12);
   const [isDeploying, setIsDeploying] = useState(false);
 
+  useEffect(() => {
+    setAccessHash(generateAccessHash());
+  }, []);
+
   const{ data: session} = useSession()
   const handleDeploy = async () => {
-    
     await createRoom({
       destName: roomName,
       accessHash: accessHash,
