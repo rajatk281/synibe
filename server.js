@@ -1,12 +1,12 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-const PORT = 3001;
+const PORT = process.env.SOCKET_PORT || 3001;
 const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -56,6 +56,16 @@ io.on("connection", (socket) => {
     };
     // Broadcast to everyone in the room
     io.to(roomId).emit("new-message", message);
+  });
+
+  // Video play — broadcast to all OTHER users in the room
+  socket.on("video-play", ({ roomId }) => {
+    socket.to(roomId).emit("video-play");
+  });
+
+  // Video pause — broadcast to all OTHER users in the room
+  socket.on("video-pause", ({ roomId }) => {
+    socket.to(roomId).emit("video-pause");
   });
 
   // User disconnects

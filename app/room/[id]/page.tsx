@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
-const SOCKET_URL = "http://localhost:3001";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
 
 /* ── Types ── */
 type MessageSide = "left" | "right" | "system";
@@ -61,6 +61,7 @@ export default function RoomPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  const isRemoteAction = useRef(false);
 
   /* ── Socket setup ── */
   useEffect(() => {
@@ -137,6 +138,21 @@ export default function RoomPage() {
       }
     );
 
+    /* ── Video sync listeners ── */
+    socket.on("video-play", () => {
+      isRemoteAction.current = true;
+      setIsPlaying(true);
+      videoRef.current?.play();
+      isRemoteAction.current = false;
+    });
+
+    socket.on("video-pause", () => {
+      isRemoteAction.current = true;
+      setIsPlaying(false);
+      videoRef.current?.pause();
+      isRemoteAction.current = false;
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -175,9 +191,14 @@ export default function RoomPage() {
   };
 
   const togglePlay = () => {
-    setIsPlaying((p) => !p);
+    const newPlaying = !isPlaying;
+    setIsPlaying(newPlaying);
     if (videoRef.current) {
-      isPlaying ? videoRef.current.pause() : videoRef.current.play();
+      newPlaying ? videoRef.current.play() : videoRef.current.pause();
+    }
+    // Broadcast to other users in the room (only if this was a local action)
+    if (!isRemoteAction.current && socketRef.current) {
+      socketRef.current.emit(newPlaying ? "video-play" : "video-pause", { roomId });
     }
   };
 
