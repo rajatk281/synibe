@@ -4,7 +4,6 @@ import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
-// import { Session } from "@/app/Components/session-provider";
 import { useSession } from "next-auth/react";
 import { createRoom } from "./actions";
 
@@ -21,6 +20,7 @@ function NewRoomContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "watch";
   const [roomName, setRoomName] = useState("");
+  const [roomNameError, setRoomNameError] = useState(false);
   const [accessHash, setAccessHash] = useState("");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [participants, setParticipants] = useState(12);
@@ -32,6 +32,11 @@ function NewRoomContent() {
 
   const{ data: session} = useSession()
   const handleDeploy = async () => {
+    if (!roomName.trim()) {
+      setRoomNameError(true);
+      return;
+    }
+    setRoomNameError(false);
     await createRoom({
       destName: roomName,
       accessHash: accessHash,
@@ -118,9 +123,21 @@ function NewRoomContent() {
                 type="text"
                 placeholder="ENTER REALM IDENTITY..."
                 value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                className="w-full bg-transparent border border-white/[0.08] rounded-xl py-3.5 px-4 text-white placeholder-slate-600 text-sm font-medium uppercase tracking-wider focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all duration-300"
+                onChange={(e) => {
+                  setRoomName(e.target.value);
+                  if (e.target.value.trim()) setRoomNameError(false);
+                }}
+                className={`w-full bg-transparent border rounded-xl py-3.5 px-4 text-white placeholder-slate-600 text-sm font-medium uppercase tracking-wider focus:outline-none transition-all duration-300 ${
+                  roomNameError
+                    ? "border-red-500/60 focus:border-red-500/80 focus:ring-1 focus:ring-red-500/20"
+                    : "border-white/[0.08] focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+                }`}
               />
+              {roomNameError && (
+                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-red-400/80">
+                  ⚠ Realm identity is required to deploy
+                </p>
+              )}
             </div>
 
             {/* Row: Access Hash + Visibility */}

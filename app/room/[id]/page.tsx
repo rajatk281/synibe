@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { io, Socket } from "socket.io-client";
 import {
   Play,
   Pause,
@@ -15,54 +18,137 @@ import {
   VolumeX,
 } from "lucide-react";
 
-/* ── Fake chat data ── */
-const INITIAL_MESSAGES = [
-  {
-    id: 1,
-    user: "ALIX_VOID",
-    avatar: "/avatar_cat.png",
-    text: "That transition was actually insane! Did you see the reflection on the visor? 🤯",
-    side: "left" as const,
-    time: "2m ago",
-  },
-  {
-    id: 2,
-    user: "YOU",
-    avatar: "/wolf_avatar.png",
-    text: "Wait for the 1:30 mark... trust me.",
-    side: "right" as const,
-    time: "1m ago",
-  },
-  {
-    id: 3,
-    user: "NEON_GHOST",
-    avatar: "/avatar_unicorn.png",
-    text: "Ready. 💜🔥",
-    side: "left" as const,
-    time: "now",
-  },
-];
-
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
+const SOCKET_URL = "http://localhost:3001";
+
+/* ── Types ── */
+type MessageSide = "left" | "right" | "system";
+
+interface ChatMessage {
+  id: number;
+  type: "chat" | "system";
+  side: MessageSide;
+  user?: string;
+  text: string;
+  timestamp: string;
+}
+
+function formatTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
 
 export default function RoomPage() {
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const params = useParams();
+  const roomId = params?.id as string;
+  const { data: session } = useSession();
+
+  const userName =
+    session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Anonymous";
+
+  /* ── State ── */
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState("");
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(35);
   const [showEmojis, setShowEmojis] = useState(false);
   const [activeReaction, setActiveReaction] = useState<string | null>(null);
-  const [viewerCount] = useState(1204);
+  const [onlineCount, setOnlineCount] = useState(0);
+  const [mySocketId, setMySocketId] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
-  // Auto-scroll chat
+  /* ── Socket setup ── */
+  useEffect(() => {
+    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      setMySocketId(socket.id ?? null);
+      setConnected(true);
+      // Announce joining the room
+      socket.emit("join-room", { roomId, userName });
+    });
+
+    socket.on("disconnect", () => {
+      setConnected(false);
+    });
+
+    socket.on("online-count", (count: number) => {
+      setOnlineCount(count);
+    });
+
+    socket.on("user-joined", ({ userName: who }: { userName: string; socketId: string }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: "system",
+          side: "system",
+          text: `${who} joined the room`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    });
+
+    socket.on("user-left", ({ userName: who }: { userName: string; socketId: string }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          type: "system",
+          side: "system",
+          text: `${who} left the room`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    });
+
+    socket.on(
+      "new-message",
+      ({
+        id,
+        socketId,
+        user,
+        text,
+        timestamp,
+      }: {
+        id: number;
+        socketId: string;
+        user: string;
+        text: string;
+        timestamp: string;
+      }) => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id,
+            type: "chat",
+            side: socketId === socket.id ? "right" : "left",
+            user,
+            text,
+            timestamp,
+          },
+        ]);
+      }
+    );
+
+    return () => {
+      socket.disconnect();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, userName]);
+
+  /* ── Auto-scroll ── */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Progress bar simulation
+  /* ── Progress simulation ── */
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
@@ -71,21 +157,17 @@ export default function RoomPage() {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
-  const sendMessage = () => {
-    if (!newMsg.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        user: "YOU",
-        avatar: "/wolf_avatar.png",
-        text: newMsg,
-        side: "right" as const,
-        time: "now",
-      },
-    ]);
+  /* ── Handlers ── */
+  const sendMessage = useCallback(() => {
+    if (!newMsg.trim() || !socketRef.current) return;
+    socketRef.current.emit("send-message", {
+      roomId,
+      text: newMsg.trim(),
+      userName,
+      socketId: mySocketId,
+    });
     setNewMsg("");
-  };
+  }, [newMsg, roomId, userName, mySocketId]);
 
   const triggerReaction = (emoji: string) => {
     setActiveReaction(emoji);
@@ -106,6 +188,7 @@ export default function RoomPage() {
     }
   };
 
+  /* ── Render ── */
   return (
     <div className="h-screen bg-[#060612] flex overflow-hidden">
       {/* ═══════════════════════════════════════════════ */}
@@ -114,7 +197,6 @@ export default function RoomPage() {
       <div className="flex-1 flex flex-col relative">
         {/* Video container */}
         <div className="flex-1 relative overflow-hidden bg-black">
-          {/* Video / Background Image */}
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
@@ -127,7 +209,6 @@ export default function RoomPage() {
 
           {/* Top overlay gradient */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10" />
-
           {/* Bottom overlay gradient */}
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060612] via-[#060612]/60 to-transparent z-10" />
 
@@ -142,7 +223,7 @@ export default function RoomPage() {
             <div className="flex items-center gap-1.5 mt-1">
               <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
               <span className="text-[10px] font-semibold text-white/50 tracking-wider uppercase">
-                {viewerCount.toLocaleString()} watching
+                {onlineCount} watching
               </span>
             </div>
           </div>
@@ -177,7 +258,6 @@ export default function RoomPage() {
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
                 style={{ width: `${progress}%` }}
               />
-              {/* Hover scrub indicator */}
               <div
                 className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg shadow-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 style={{ left: `${progress}%`, transform: `translate(-50%, -50%)` }}
@@ -236,8 +316,15 @@ export default function RoomPage() {
               Live Chat
             </span>
             <span className="ml-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">
-              3 Online
+              {onlineCount} Online
             </span>
+            {/* Connection indicator */}
+            <span
+              className={`w-1.5 h-1.5 rounded-full ml-1 ${
+                connected ? "bg-green-400 animate-pulse" : "bg-red-500"
+              }`}
+              title={connected ? "Connected" : "Disconnected"}
+            />
           </div>
           <div className="flex items-center gap-1.5">
             <button
@@ -256,48 +343,68 @@ export default function RoomPage() {
         </div>
 
         {/* Chat messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-2.5 ${msg.side === "right" ? "flex-row-reverse" : ""} room-msg-appear`}
-            >
-              {/* Avatar */}
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/[0.08] flex-shrink-0 mt-1">
-                <Image
-                  src={msg.avatar}
-                  alt={msg.user}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Bubble */}
-              <div
-                className={`max-w-[75%] ${
-                  msg.side === "right" ? "items-end" : "items-start"
-                } flex flex-col`}
-              >
-                {msg.side === "left" && (
-                  <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-1 ml-1">
-                    {msg.user}
-                  </span>
-                )}
-                <div
-                  className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
-                    msg.side === "right"
-                      ? "bg-gradient-to-br from-purple-600/30 to-pink-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
-                      : "bg-white/[0.05] text-white/80 rounded-tl-md border border-white/[0.06]"
-                  }`}
-                >
-                  {msg.text}
-                </div>
-                <span className="text-[9px] text-white/20 mt-1 mx-1 font-medium">
-                  {msg.time}
-                </span>
-              </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30">
+              <Users className="w-8 h-8 text-purple-400" />
+              <p className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">
+                No messages yet
+              </p>
             </div>
-          ))}
+          )}
+
+          {messages.map((msg) => {
+            /* System notification */
+            if (msg.type === "system") {
+              return (
+                <div
+                  key={msg.id}
+                  className="flex items-center gap-2 justify-center room-msg-appear"
+                >
+                  <div className="h-px flex-1 bg-white/[0.05]" />
+                  <span className="text-[10px] text-purple-400/60 font-semibold uppercase tracking-[0.12em] px-2 py-1 rounded-full bg-purple-500/[0.07] border border-purple-500/10 whitespace-nowrap">
+                    {msg.text}
+                  </span>
+                  <div className="h-px flex-1 bg-white/[0.05]" />
+                </div>
+              );
+            }
+
+            /* Chat bubble */
+            return (
+              <div
+                key={msg.id}
+                className={`flex gap-2.5 ${
+                  msg.side === "right" ? "flex-row-reverse" : ""
+                } room-msg-appear`}
+              >
+                {/* Bubble */}
+                <div
+                  className={`max-w-[80%] ${
+                    msg.side === "right" ? "items-end" : "items-start"
+                  } flex flex-col`}
+                >
+                  {msg.side === "left" && (
+                    <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-1 ml-1">
+                      {msg.user}
+                    </span>
+                  )}
+                  <div
+                    className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
+                      msg.side === "right"
+                        ? "bg-gradient-to-br from-purple-600/30 to-pink-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
+                        : "bg-white/[0.05] text-white/80 rounded-tl-md border border-white/[0.06]"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                  <span className="text-[9px] text-white/20 mt-1 mx-1 font-medium">
+                    {formatTime(msg.timestamp)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
           <div ref={chatEndRef} />
         </div>
 
@@ -323,7 +430,8 @@ export default function RoomPage() {
             <button
               id="send-msg-btn"
               onClick={sendMessage}
-              className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/20 cursor-pointer"
+              disabled={!connected || !newMsg.trim()}
+              className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/20 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
