@@ -56,7 +56,7 @@ function formatVideoTime(seconds: number) {
 export default function RoomPage() {
   const params = useParams();
   const roomId = params?.id as string;
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const userName =
     session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Anonymous";
@@ -111,6 +111,8 @@ export default function RoomPage() {
 
   /* ── Socket setup ── */
   useEffect(() => {
+    if (status === "loading") return;
+
     const socket = io(SOCKET_URL, { transports: ["websocket"] });
     socketRef.current = socket;
 
@@ -290,7 +292,7 @@ export default function RoomPage() {
       socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, userName, showSyncToast]);
+  }, [roomId, userName, status, showSyncToast]);
 
   /* ── Auto-scroll chat ── */
   useEffect(() => {
