@@ -9,6 +9,7 @@ import {
   Play,
   Pause,
   Maximize2,
+  Minimize2,
   Settings,
   LayoutGrid,
   Users,
@@ -16,10 +17,12 @@ import {
   Send,
   Volume2,
   VolumeX,
+  MessageSquare,
 } from "lucide-react";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+const SOCKET_URL = "http://localhost:3001";
+const HEARTBEAT_INTERVAL = 3000; // 3 seconds
 
 /* ── Types ── */
 type MessageSide = "left" | "right" | "system";
@@ -33,9 +36,21 @@ interface ChatMessage {
   timestamp: string;
 }
 
+interface SyncToast {
+  id: number;
+  text: string;
+}
+
 function formatTime(iso: string) {
   const d = new Date(iso);
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatVideoTime(seconds: number) {
+  if (!isFinite(seconds) || isNaN(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 export default function RoomPage() {
@@ -49,19 +64,50 @@ export default function RoomPage() {
   /* ── State ── */
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState("");
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [progress, setProgress] = useState(35);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [showEmojis, setShowEmojis] = useState(false);
   const [activeReaction, setActiveReaction] = useState<string | null>(null);
   const [onlineCount, setOnlineCount] = useState(0);
   const [mySocketId, setMySocketId] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
+  const [syncToasts, setSyncToasts] = useState<SyncToast[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showFullscreenChat, setShowFullscreenChat] = useState(true);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const socketRef = useRef<Socket | null>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
   const isRemoteAction = useRef(false);
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+  const fullscreenChatEndRef = useRef<HTMLDivElement>(null);
+
+  /* ── Helper: show a sync toast ── */
+  const showSyncToast = useCallback((text: string) => {
+    const id = Date.now() + Math.random();
+    setSyncToasts((prev) => [...prev, { id, text }]);
+    setTimeout(() => {
+      setSyncToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  }, []);
+
+  /* ── Helper: emit video action ── */
+  const emitVideoAction = useCallback(
+    (action: string, time: number) => {
+      if (!socketRef.current || isRemoteAction.current) return;
+      socketRef.current.emit("video-action", {
+        roomId,
+        action,
+        currentTime: time,
+        userName,
+      });
+    },
+    [roomId, userName]
+  );
 
   /* ── Socket setup ── */
   useEffect(() => {
@@ -83,32 +129,67 @@ export default function RoomPage() {
       setOnlineCount(count);
     });
 
-    socket.on("user-joined", ({ userName: who }: { userName: string; socketId: string }) => {
+    // ── Message history from server (on join) ──
+    socket.on("message-history", (history: Array<{
+      id: number;
+      type: "chat" | "system";
+      socketId?: string;
+      user?: string;
+      text: string;
+      timestamp: string;
+    }>) => {
+      const mapped: ChatMessage[] = history.map((msg) => ({
+        id: msg.id,
+        type: msg.type,
+        side: msg.type === "system"
+          ? "system"
+          : msg.socketId === socket.id
+            ? "right"
+            : "left",
+        user: msg.user,
+        text: msg.text,
+        timestamp: msg.timestamp,
+      }));
+      setMessages(mapped);
+    });
+
+    // ── User joined (system message comes from server) ──
+    socket.on("user-joined", ({ message }: {
+      userName: string;
+      socketId: string;
+      message: { id: number; type: "system"; text: string; timestamp: string };
+    }) => {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now(),
+          id: message.id,
           type: "system",
           side: "system",
-          text: `${who} joined the room`,
-          timestamp: new Date().toISOString(),
+          text: message.text,
+          timestamp: message.timestamp,
         },
       ]);
     });
 
-    socket.on("user-left", ({ userName: who }: { userName: string; socketId: string }) => {
+    // ── User left (system message comes from server) ──
+    socket.on("user-left", ({ message }: {
+      userName: string;
+      socketId: string;
+      message: { id: number; type: "system"; text: string; timestamp: string };
+    }) => {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: message.id,
           type: "system",
           side: "system",
-          text: `${who} left the room`,
-          timestamp: new Date().toISOString(),
+          text: message.text,
+          timestamp: message.timestamp,
         },
       ]);
     });
 
+    // ── New chat message ──
     socket.on(
       "new-message",
       ({
@@ -138,40 +219,150 @@ export default function RoomPage() {
       }
     );
 
-    /* ── Video sync listeners ── */
-    socket.on("video-play", () => {
+    // ═══════════════════════════════════════════════
+    //  VIDEO SYNC — incoming events
+    // ═══════════════════════════════════════════════
+
+    // ── Video state on join (sync to room's current position) ──
+    socket.on("video-state", ({ currentTime: time, isPlaying: playing }: {
+      currentTime: number;
+      isPlaying: boolean;
+    }) => {
+      const video = videoRef.current;
+      if (!video) return;
+
       isRemoteAction.current = true;
-      setIsPlaying(true);
-      videoRef.current?.play();
-      isRemoteAction.current = false;
+      video.currentTime = time;
+      if (playing) {
+        video.play().catch(() => {});
+        setIsPlaying(true);
+      } else {
+        video.pause();
+        setIsPlaying(false);
+      }
+      setTimeout(() => {
+        isRemoteAction.current = false;
+      }, 200);
     });
 
-    socket.on("video-pause", () => {
+    // ── Remote user performed a video action ──
+    socket.on("video-sync", ({ action, currentTime: time, userName: who }: {
+      action: string;
+      currentTime: number;
+      userName: string;
+      socketId: string;
+    }) => {
+      const video = videoRef.current;
+      if (!video) return;
+
       isRemoteAction.current = true;
-      setIsPlaying(false);
-      videoRef.current?.pause();
-      isRemoteAction.current = false;
+
+      switch (action) {
+        case "play":
+          video.currentTime = time;
+          video.play().catch(() => {});
+          setIsPlaying(true);
+          showSyncToast(`${who} resumed playback`);
+          break;
+        case "pause":
+          video.currentTime = time;
+          video.pause();
+          setIsPlaying(false);
+          showSyncToast(`${who} paused the video`);
+          break;
+        case "seek":
+        case "seek-while-playing":
+          video.currentTime = time;
+          if (action === "seek-while-playing") {
+            video.play().catch(() => {});
+            setIsPlaying(true);
+          }
+          showSyncToast(`${who} seeked to ${formatVideoTime(time)}`);
+          break;
+      }
+
+      setTimeout(() => {
+        isRemoteAction.current = false;
+      }, 200);
     });
 
     return () => {
       socket.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, userName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, userName, showSyncToast]);
 
-  /* ── Auto-scroll ── */
+  /* ── Auto-scroll chat ── */
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    fullscreenChatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isFullscreen, showFullscreenChat]);
 
-  /* ── Progress simulation ── */
+  /* ── Fullscreen change listener ── */
   useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      setProgress((p) => (p >= 100 ? 0 : p + 0.05));
-    }, 100);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  /* ── Video time tracking ── */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+    };
+
+    const handleDurationChange = () => {
+      setDuration(video.duration);
+    };
+
+    const handleLoadedMetadata = () => {
+      setDuration(video.duration);
+    };
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("durationchange", handleDurationChange);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("durationchange", handleDurationChange);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    };
+  }, []);
+
+  /* ── Heartbeat: send video position every 3s while playing ── */
+  useEffect(() => {
+    if (heartbeatRef.current) {
+      clearInterval(heartbeatRef.current);
+      heartbeatRef.current = null;
+    }
+
+    if (isPlaying && socketRef.current && connected) {
+      heartbeatRef.current = setInterval(() => {
+        const video = videoRef.current;
+        if (!video || !socketRef.current) return;
+        socketRef.current.emit("video-heartbeat", {
+          roomId,
+          currentTime: video.currentTime,
+          isPlaying: !video.paused,
+        });
+      }, HEARTBEAT_INTERVAL);
+    }
+
+    return () => {
+      if (heartbeatRef.current) {
+        clearInterval(heartbeatRef.current);
+        heartbeatRef.current = null;
+      }
+    };
+  }, [isPlaying, connected, roomId]);
 
   /* ── Handlers ── */
   const sendMessage = useCallback(() => {
@@ -191,14 +382,17 @@ export default function RoomPage() {
   };
 
   const togglePlay = () => {
-    const newPlaying = !isPlaying;
-    setIsPlaying(newPlaying);
-    if (videoRef.current) {
-      newPlaying ? videoRef.current.play() : videoRef.current.pause();
-    }
-    // Broadcast to other users in the room (only if this was a local action)
-    if (!isRemoteAction.current && socketRef.current) {
-      socketRef.current.emit(newPlaying ? "video-play" : "video-pause", { roomId });
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+      emitVideoAction("pause", video.currentTime);
+    } else {
+      video.play().catch(() => {});
+      setIsPlaying(true);
+      emitVideoAction("play", video.currentTime);
     }
   };
 
@@ -209,6 +403,34 @@ export default function RoomPage() {
     }
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const bar = progressBarRef.current;
+    const video = videoRef.current;
+    if (!bar || !video || !duration) return;
+
+    const rect = bar.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const seekTime = fraction * duration;
+
+    video.currentTime = seekTime;
+    setCurrentTime(seekTime);
+
+    const action = isPlaying ? "seek-while-playing" : "seek";
+    emitVideoAction(action, seekTime);
+  };
+
+  const toggleFullscreen = () => {
+    const container = playerContainerRef.current;
+    if (!container) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    } else {
+      container.requestFullscreen().catch(() => {});
+    }
+  };
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   /* ── Render ── */
   return (
     <div className="h-screen bg-[#060612] flex overflow-hidden">
@@ -217,7 +439,7 @@ export default function RoomPage() {
       {/* ═══════════════════════════════════════════════ */}
       <div className="flex-1 flex flex-col relative">
         {/* Video container */}
-        <div className="flex-1 relative overflow-hidden bg-black">
+        <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black">
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
@@ -226,7 +448,104 @@ export default function RoomPage() {
             loop
             muted={isMuted}
             playsInline
+            onPlay={() => {
+              if (!isRemoteAction.current) setIsPlaying(true);
+            }}
+            onPause={() => {
+              if (!isRemoteAction.current) setIsPlaying(false);
+            }}
           />
+
+          {/* ── Fullscreen Floating Chat Panel ── */}
+          {isFullscreen && showFullscreenChat && (
+            <div className="absolute top-20 right-5 bottom-28 w-80 lg:w-96 bg-transparent flex flex-col overflow-hidden z-30 room-msg-appear">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-transparent">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-300 drop-shadow-md">
+                    Live Chat
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowFullscreenChat(false)}
+                  className="text-white/50 hover:text-white/90 transition-colors text-xs font-semibold px-2.5 py-1 rounded bg-[#0a0a14]/60 backdrop-blur-md border border-white/[0.08] cursor-pointer hover:bg-[#0a0a14]/80"
+                >
+                  Hide
+                </button>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin">
+                {messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30">
+                    <Users className="w-6 h-6 text-purple-400" />
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">
+                      No messages yet
+                    </p>
+                  </div>
+                )}
+                {messages.map((msg) => {
+                  if (msg.type === "system") {
+                    return (
+                      <div key={msg.id} className="flex items-center gap-2 justify-center">
+                        <div className="h-px flex-1 bg-white/[0.05]" />
+                        <span className="text-[9px] text-purple-400/60 font-semibold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full bg-[#0a0a14]/40 backdrop-blur-sm border border-purple-500/10 whitespace-nowrap">
+                          {msg.text}
+                        </span>
+                        <div className="h-px flex-1 bg-white/[0.05]" />
+                      </div>
+                    );
+                  }
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2.5 ${msg.side === "right" ? "flex-row-reverse" : ""} room-msg-appear`}
+                    >
+                      <div className={`max-w-[85%] ${msg.side === "right" ? "items-end" : "items-start"} flex flex-col`}>
+                        {msg.side === "left" && (
+                          <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-0.5 ml-1 drop-shadow-md">
+                            {msg.user}
+                          </span>
+                        )}
+                        <div
+                          className={`px-3 py-2 rounded-xl text-[12px] leading-relaxed font-medium ${
+                            msg.side === "right"
+                              ? "bg-gradient-to-br from-purple-600/70 to-pink-600/60 backdrop-blur-sm text-white rounded-tr-md border border-purple-500/20 shadow-lg shadow-purple-500/10"
+                              : "bg-[#0a0a14]/70 backdrop-blur-sm text-white/95 rounded-tl-md border border-white/10 shadow-lg"
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={fullscreenChatEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="px-3 py-2 bg-transparent">
+                <div className="flex items-center gap-2 bg-[#0a0a14]/70 backdrop-blur-md rounded-lg border border-white/[0.1] px-2.5 py-1.5 focus-within:border-purple-500/50 transition-all duration-300 shadow-lg">
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    value={newMsg}
+                    onChange={(e) => setNewMsg(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    className="flex-1 bg-transparent text-xs text-white placeholder-white/30 outline-none font-medium"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!connected || !newMsg.trim()}
+                    className="w-6 h-6 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <Send className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Top overlay gradient */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10" />
@@ -247,6 +566,18 @@ export default function RoomPage() {
                 {onlineCount} watching
               </span>
             </div>
+          </div>
+
+          {/* ── Sync toast notifications ── */}
+          <div className="absolute top-5 right-5 z-30 flex flex-col gap-2 items-end">
+            {syncToasts.map((toast) => (
+              <div
+                key={toast.id}
+                className="sync-toast px-3 py-2 rounded-lg bg-purple-500/20 backdrop-blur-xl border border-purple-500/20 text-xs font-medium text-purple-200 shadow-lg shadow-purple-500/10"
+              >
+                {toast.text}
+              </div>
+            ))}
           </div>
 
           {/* ── Floating emoji reaction ── */}
@@ -273,8 +604,12 @@ export default function RoomPage() {
               </div>
             </div>
 
-            {/* Progress bar */}
-            <div className="relative w-full h-1 bg-white/[0.08] rounded-full overflow-hidden group cursor-pointer mb-3">
+            {/* Progress bar — clickable to seek */}
+            <div
+              ref={progressBarRef}
+              onClick={handleSeek}
+              className="relative w-full h-1 bg-white/[0.08] rounded-full overflow-hidden group cursor-pointer mb-3"
+            >
               <div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
                 style={{ width: `${progress}%` }}
@@ -311,15 +646,36 @@ export default function RoomPage() {
                   )}
                 </button>
                 <span className="text-[11px] font-medium text-white/40 tracking-wide tabular-nums">
-                  12:47 / 36:20
+                  {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
                 </span>
               </div>
-              <button
-                id="fullscreen-btn"
-                className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
-              >
-                <Maximize2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {isFullscreen && (
+                  <button
+                    id="toggle-fullscreen-chat-btn"
+                    onClick={() => setShowFullscreenChat(!showFullscreenChat)}
+                    className={`w-9 h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                      showFullscreenChat
+                        ? "bg-purple-500/25 border-purple-500/40 text-purple-300 hover:bg-purple-500/40"
+                        : "bg-white/[0.08] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.15]"
+                    }`}
+                    title={showFullscreenChat ? "Hide Chat" : "Show Chat"}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  id="fullscreen-btn"
+                  onClick={toggleFullscreen}
+                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="w-4 h-4" />
+                  ) : (
+                    <Maximize2 className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
