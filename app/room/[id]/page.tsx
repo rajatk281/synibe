@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
-const SOCKET_URL = "http://localhost:3001";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 const HEARTBEAT_INTERVAL = 3000; // 3 seconds
 
 /* ── Types ── */

@@ -2,7 +2,10 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 const PORT = process.env.PORT ||3001;
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Socket server is running");
+});
 
 const io = new Server(httpServer, {
   cors: {
@@ -188,6 +191,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT,  "0.0.0.0", () => {
   console.log(`\n🔌 Socket.io server running on http://localhost:${PORT}\n`);
 });
