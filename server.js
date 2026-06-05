@@ -147,6 +147,25 @@ io.on("connection", (socket) => {
     });
   });
 
+  // ═══════════════════════════════════════════════
+  //  ADMISSION CONTROL EVENTS
+  // ═══════════════════════════════════════════════
+
+  // Guest requests to join a private room
+  socket.on("request-join", ({ roomId, userName }) => {
+    // Broadcast join-request to the room (intended for the host to intercept)
+    io.to(roomId).emit("join-request", {
+      socketId: socket.id,
+      userName: userName || "Anonymous",
+    });
+  });
+
+  // Host responds to a join request
+  socket.on("respond-join", ({ targetSocketId, approved }) => {
+    // Send response specifically to the waiting guest
+    io.to(targetSocketId).emit("join-response", approved);
+  });
+
   // User disconnects
   socket.on("disconnect", () => {
     if (!currentRoom || !currentUser) return;

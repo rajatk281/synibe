@@ -30,5 +30,6 @@ export async function GET(
     visibility: room.visibility,
     participantLimit: room.participantLimit,
     videoUrl: room.videoUrl,
+    creatorId: room.creatorId,
   });
 }

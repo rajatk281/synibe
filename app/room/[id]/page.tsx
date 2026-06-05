@@ -96,6 +96,10 @@ export default function RoomPage() {
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [roomName, setRoomName] = useState<string>("");
   const [roomLoading, setRoomLoading] = useState(true);
+  const [isHost, setIsHost] = useState(false);
+  const [roomVisibility, setRoomVisibility] = useState<"public" | "private">("public");
+  const [admissionStatus, setAdmissionStatus] = useState<"none" | "pending" | "accepted" | "denied">("none");
+  const [joinRequests, setJoinRequests] = useState<{ socketId: string; userName: string }[]>([]);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -130,6 +134,10 @@ export default function RoomPage() {
           const data = await res.json();
           setVideoUrl(data.videoUrl || "");
           setRoomName(data.destName || "");
+          setRoomVisibility(data.visibility || "public");
+          if (session?.user?.id && data.creatorId === session.user.id) {
+            setIsHost(true);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch room data:", err);
@@ -137,8 +145,8 @@ export default function RoomPage() {
         setRoomLoading(false);
       }
     }
-    if (roomId) fetchRoom();
-  }, [roomId]);
+    if (roomId && status !== "loading") fetchRoom();
+  }, [roomId, session?.user?.id, status]);
 
   /* ── YouTube IFrame API ── */
   useEffect(() => {
@@ -239,7 +247,7 @@ export default function RoomPage() {
 
   /* ── Socket setup ── */
   useEffect(() => {
-    if (status === "loading") return;
+    if (status === "loading" || roomLoading) return;
 
     const socket = io(SOCKET_URL, { transports: ["websocket"] });
     socketRef.current = socket;
@@ -247,8 +255,13 @@ export default function RoomPage() {
     socket.on("connect", () => {
       setMySocketId(socket.id ?? null);
       setConnected(true);
-      // Announce joining the room
-      socket.emit("join-room", { roomId, userName });
+      
+      if (!isHost && roomVisibility === "private" && admissionStatus === "none") {
+        setAdmissionStatus("pending");
+        socket.emit("request-join", { roomId, userName });
+      } else if (admissionStatus !== "pending" && admissionStatus !== "denied") {
+        socket.emit("join-room", { roomId, userName });
+      }
     });
 
     socket.on("disconnect", () => {
@@ -257,6 +270,22 @@ export default function RoomPage() {
 
     socket.on("online-count", (count: number) => {
       setOnlineCount(count);
+    });
+
+    // ── Admission Control Events ──
+    socket.on("join-request", (request: { socketId: string; userName: string }) => {
+      if (isHost) {
+        setJoinRequests((prev) => [...prev, request]);
+      }
+    });
+
+    socket.on("join-response", (approved: boolean) => {
+      if (approved) {
+        setAdmissionStatus("accepted");
+        socket.emit("join-room", { roomId, userName });
+      } else {
+        setAdmissionStatus("denied");
+      }
     });
 
     // ── Message history from server (on join) ──
@@ -595,6 +624,13 @@ export default function RoomPage() {
     emitVideoAction(action, seekTime);
   };
 
+  const handleJoinResponse = (socketId: string, approved: boolean) => {
+    if (socketRef.current) {
+      socketRef.current.emit("respond-join", { targetSocketId: socketId, approved });
+      setJoinRequests((prev) => prev.filter((r) => r.socketId !== socketId));
+    }
+  };
+
   const toggleFullscreen = () => {
     const container = playerContainerRef.current;
     if (!container) return;
@@ -608,6 +644,32 @@ export default function RoomPage() {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   /* ── Render ── */
+  if (admissionStatus === "pending") {
+    return (
+      <div className="h-screen bg-[#060612] flex flex-col items-center justify-center text-white px-4">
+        <div className="w-12 h-12 border-4 border-white/10 border-t-purple-500 rounded-full animate-spin mb-6" />
+        <h2 className="text-xl font-bold mb-2">Waiting for Host</h2>
+        <p className="text-slate-400 text-center max-w-md">
+          This is a private room. The host has been notified that you want to join and must approve your request.
+        </p>
+      </div>
+    );
+  }
+
+  if (admissionStatus === "denied") {
+    return (
+      <div className="h-screen bg-[#060612] flex flex-col items-center justify-center text-white px-4">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+          <span className="text-red-500 text-3xl">✕</span>
+        </div>
+        <h2 className="text-xl font-bold mb-2">Request Denied</h2>
+        <p className="text-slate-400 text-center max-w-md">
+          The host declined your request to join this room.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-[#060612] flex overflow-hidden">
       {/* ═══════════════════════════════════════════════ */}
@@ -783,6 +845,33 @@ export default function RoomPage() {
               </span>
             </div>
           </div>
+
+          {/* ── Pending Requests (Host Only) ── */}
+          {isHost && joinRequests.length > 0 && (
+            <div className="absolute top-20 left-5 z-40 flex flex-col gap-3 max-h-60 overflow-y-auto">
+              {joinRequests.map((req) => (
+                <div key={req.socketId} className="bg-[#0a0a0c]/90 border border-purple-500/30 rounded-xl p-4 backdrop-blur-md shadow-2xl animate-in">
+                  <p className="text-sm text-white mb-3">
+                    <span className="font-bold">{req.userName}</span> wants to join
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleJoinResponse(req.socketId, true)}
+                      className="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleJoinResponse(req.socketId, false)}
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+                    >
+                      Deny
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* ── Sync toast notifications ── */}
           <div className="absolute top-5 right-5 z-30 flex flex-col gap-2 items-end">
