@@ -12,7 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "socket": "node server.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run socket\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run socket\" \"npm run db:studio\""
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

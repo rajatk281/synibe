@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { io, Socket } from "socket.io-client";
 import {
@@ -19,6 +18,7 @@ import {
   VolumeX,
   MessageSquare,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
@@ -70,13 +70,18 @@ declare global {
   }
 }
 
+
+
 export default function RoomPage() {
+
   const params = useParams();
   const roomId = params?.id as string;
   const { data: session, status } = useSession();
 
   const userName =
     session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Anonymous";
+
+    
 
   /* ── State ── */
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -368,7 +373,7 @@ export default function RoomPage() {
         const video = videoRef.current;
         if (!video) { isRemoteAction.current = false; return; }
         video.currentTime = time;
-        if (playing) { video.play().catch(() => {}); setIsPlaying(true); }
+        if (playing) { video.play().catch(() => { }); setIsPlaying(true); }
         else { video.pause(); setIsPlaying(false); }
       }
 
@@ -409,7 +414,7 @@ export default function RoomPage() {
         // Native video player
         switch (action) {
           case "play":
-            video.currentTime = time; video.play().catch(() => {}); setIsPlaying(true);
+            video.currentTime = time; video.play().catch(() => { }); setIsPlaying(true);
             showSyncToast(`${who} resumed playback`);
             break;
           case "pause":
@@ -419,7 +424,7 @@ export default function RoomPage() {
           case "seek":
           case "seek-while-playing":
             video.currentTime = time;
-            if (action === "seek-while-playing") { video.play().catch(() => {}); setIsPlaying(true); }
+            if (action === "seek-while-playing") { video.play().catch(() => { }); setIsPlaying(true); }
             showSyncToast(`${who} seeked to ${formatVideoTime(time)}`);
             break;
         }
@@ -450,6 +455,7 @@ export default function RoomPage() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
+  
 
   /* ── Video time tracking ── */
   useEffect(() => {
@@ -556,7 +562,7 @@ export default function RoomPage() {
         setIsPlaying(false);
         emitVideoAction("pause", video.currentTime);
       } else {
-        video.play().catch(() => {});
+        video.play().catch(() => { });
         setIsPlaying(true);
         emitVideoAction("play", video.currentTime);
       }
@@ -599,11 +605,22 @@ export default function RoomPage() {
     const container = playerContainerRef.current;
     if (!container) return;
     if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     } else {
-      container.requestFullscreen().catch(() => {});
+      container.requestFullscreen().catch(() => { });
     }
   };
+  const [ExitBtn, setExitBtn] = useState(false)
+  const router = useRouter()
+  const handleExitBtn = () => {
+    setExitBtn(true)
+  }
+  const handleYesBtn = () =>{
+    router.push("/")
+  }
+  const handleNoBtn = () =>{
+    setExitBtn(false)
+  }
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -673,6 +690,11 @@ export default function RoomPage() {
             </div>
           )}
 
+          <div>
+
+            hi
+          </div>
+
           {/* ── Fullscreen Floating Chat Panel ── */}
           {isFullscreen && showFullscreenChat && (
             <div className="absolute top-20 right-5 bottom-28 w-80 lg:w-96 bg-transparent flex flex-col overflow-hidden z-30 room-msg-appear">
@@ -726,11 +748,10 @@ export default function RoomPage() {
                           </span>
                         )}
                         <div
-                          className={`px-3 py-2 rounded-xl text-[12px] leading-relaxed font-medium ${
-                            msg.side === "right"
+                          className={`px-3 py-2 rounded-xl text-[12px] leading-relaxed font-medium ${msg.side === "right"
                               ? "bg-gradient-to-br from-purple-600/70 to-pink-600/60 backdrop-blur-sm text-white rounded-tr-md border border-purple-500/20 shadow-lg shadow-purple-500/10"
                               : "bg-[#0a0a14]/70 backdrop-blur-sm text-white/95 rounded-tl-md border border-white/10 shadow-lg"
-                          }`}
+                            }`}
                         >
                           {msg.text}
                         </div>
@@ -870,11 +891,10 @@ export default function RoomPage() {
                   <button
                     id="toggle-fullscreen-chat-btn"
                     onClick={() => setShowFullscreenChat(!showFullscreenChat)}
-                    className={`w-9 h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${
-                      showFullscreenChat
+                    className={`w-9 h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${showFullscreenChat
                         ? "bg-purple-500/25 border-purple-500/40 text-purple-300 hover:bg-purple-500/40"
                         : "bg-white/[0.08] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.15]"
-                    }`}
+                      }`}
                     title={showFullscreenChat ? "Hide Chat" : "Show Chat"}
                   >
                     <MessageSquare className="w-4 h-4" />
@@ -897,6 +917,18 @@ export default function RoomPage() {
         </div>
       </div>
 
+      <div className="fixed z-50 p right-5/19 mt-6 px-4 py-1 ">
+        <Button onClick={()=>{handleExitBtn()}} className="hover:cursor-pointer font-semibold hover:scale-105 p-5 transition-all bg-red-500 duration-300">Leave</Button>
+      </div>
+      {ExitBtn && <div className="fixed h-1/5 z-50 top-1/3 bg-white right-1/2 border rounded-xl p-4">
+      <h1 className="text-black font-semibold text-center">Are you sure want to exit ?</h1>
+      <div className="flex gap-2 justify-center pt-6">
+        <button onClick={()=>{handleYesBtn()}} className="bg-red-500 px-4 py-2 rounded-xl font-bold text-white hover:cursor-pointer hover:scale-105 hover:border transition-all duration-500">Yes</button>
+        <button onClick={()=>{handleNoBtn()}} className="bg-white px-4 py-2 rounded-xl font-bold text-black hover:cursor-pointer hover:scale-105 hover:border transition-all duration-500">No</button>
+      </div> 
+    </div>}
+
+
       {/* ═══════════════════════════════════════════════ */}
       {/*  RIGHT — Chat Panel                            */}
       {/* ═══════════════════════════════════════════════ */}
@@ -913,9 +945,8 @@ export default function RoomPage() {
             </span>
             {/* Connection indicator */}
             <span
-              className={`w-1.5 h-1.5 rounded-full ml-1 ${
-                connected ? "bg-green-400 animate-pulse" : "bg-red-500"
-              }`}
+              className={`w-1.5 h-1.5 rounded-full ml-1 ${connected ? "bg-green-400 animate-pulse" : "bg-red-500"
+                }`}
               title={connected ? "Connected" : "Disconnected"}
             />
           </div>
@@ -967,15 +998,13 @@ export default function RoomPage() {
             return (
               <div
                 key={msg.id}
-                className={`flex gap-2.5 ${
-                  msg.side === "right" ? "flex-row-reverse" : ""
-                } room-msg-appear`}
+                className={`flex gap-2.5 ${msg.side === "right" ? "flex-row-reverse" : ""
+                  } room-msg-appear`}
               >
                 {/* Bubble */}
                 <div
-                  className={`max-w-[80%] ${
-                    msg.side === "right" ? "items-end" : "items-start"
-                  } flex flex-col`}
+                  className={`max-w-[80%] ${msg.side === "right" ? "items-end" : "items-start"
+                    } flex flex-col`}
                 >
                   {msg.side === "left" && (
                     <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-1 ml-1">
@@ -983,11 +1012,10 @@ export default function RoomPage() {
                     </span>
                   )}
                   <div
-                    className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${
-                      msg.side === "right"
+                    className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${msg.side === "right"
                         ? "bg-gradient-to-br from-purple-600/30 to-pink-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
                         : "bg-white/[0.05] text-white/80 rounded-tl-md border border-white/[0.06]"
-                    }`}
+                      }`}
                   >
                     {msg.text}
                   </div>
@@ -1032,7 +1060,7 @@ export default function RoomPage() {
 
           {/* Quick emoji picker */}
           {showEmojis && (
-            <div className="mt-2 flex items-center gap-1 flex-wrap px-1 room-emojis-appear">
+            <div className="mt-2 flex items-center gap-1 flex-wrap px-1 room-emojis-appear" draggable={true}>
               {["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬", "😮", "🥺", "💯", "🫡"].map(
                 (emoji) => (
                   <button
@@ -1049,30 +1077,6 @@ export default function RoomPage() {
               )}
             </div>
           )}
-        </div>
-
-        {/* Bottom mascot peek */}
-        <div className="relative h-16 overflow-hidden">
-          <div className="absolute -bottom-4 left-4">
-            <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-white/[0.06]">
-              <Image
-                src="/wolf_avatar.png"
-                alt="Your character"
-                fill
-                className="object-cover opacity-50"
-              />
-            </div>
-          </div>
-          <div className="absolute -bottom-4 right-4">
-            <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-white/[0.06]">
-              <Image
-                src="/avatar_unicorn.png"
-                alt="Guest character"
-                fill
-                className="object-cover opacity-50"
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>
