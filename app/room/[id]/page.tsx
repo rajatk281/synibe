@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
-const SOCKET_URL = "http://localhost:3001";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
 const HEARTBEAT_INTERVAL = 3000; // 3 seconds
 
 /* ── Types ── */
@@ -249,7 +249,9 @@ export default function RoomPage() {
   useEffect(() => {
     if (status === "loading" || roomLoading) return;
 
-    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    const socket = io(SOCKET_URL, {
+      transports: ["polling", "websocket"],
+    });
     socketRef.current = socket;
 
     socket.on("connect", () => {

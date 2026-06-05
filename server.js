@@ -7,8 +7,12 @@ const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+    credentials: false,
   },
+  transports: ["websocket", "polling"],
+  allowEIO3: true,
 });
 
 // Track users per room: roomId -> Map<socketId, userName>
