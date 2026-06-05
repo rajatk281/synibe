@@ -920,13 +920,52 @@ export default function RoomPage() {
       <div className="fixed z-50 p right-5/19 mt-6 px-4 py-1 ">
         <Button onClick={()=>{handleExitBtn()}} className="hover:cursor-pointer font-semibold hover:scale-105 p-5 transition-all bg-red-500 duration-300">Leave</Button>
       </div>
-      {ExitBtn && <div className="fixed h-1/5 z-50 top-1/3 bg-white right-1/2 border rounded-xl p-4">
-      <h1 className="text-black font-semibold text-center">Are you sure want to exit ?</h1>
-      <div className="flex gap-2 justify-center pt-6">
-        <button onClick={()=>{handleYesBtn()}} className="bg-red-500 px-4 py-2 rounded-xl font-bold text-white hover:cursor-pointer hover:scale-105 hover:border transition-all duration-500">Yes</button>
-        <button onClick={()=>{handleNoBtn()}} className="bg-white px-4 py-2 rounded-xl font-bold text-black hover:cursor-pointer hover:scale-105 hover:border transition-all duration-500">No</button>
-      </div> 
-    </div>}
+      {ExitBtn && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    {/* Backdrop */}
+    <div
+      className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      onClick={handleNoBtn}
+    />
+
+    {/* Modal */}
+    <div className="relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+      
+      {/* Warning Icon */}
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+        <span className="text-3xl">⚠️</span>
+      </div>
+
+      {/* Heading */}
+      <h2 className="mt-4 text-center text-xl font-bold text-gray-900">
+        Leave Room?
+      </h2>
+
+      {/* Description */}
+      <p className="mt-2 text-center text-sm text-gray-600">
+        You will be disconnected from the synced session and stop watching
+        together with other participants.
+      </p>
+
+      {/* Buttons */}
+      <div className="mt-6 flex justify-center gap-3">
+        <button
+          onClick={handleNoBtn}
+          className="rounded-xl border border-gray-300 px-5 py-2 font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:cursor-pointer"
+        >
+          Stay
+        </button>
+
+        <button
+          onClick={handleYesBtn}
+          className="rounded-xl bg-red-500 px-5 py-2 font-medium text-white transition-all duration-200 hover:bg-red-600 hover:scale-105 hover:cursor-pointer"
+        >
+          Leave Room
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
       {/* ═══════════════════════════════════════════════ */}

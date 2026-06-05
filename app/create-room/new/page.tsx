@@ -53,7 +53,7 @@ function NewRoomContent() {
       videoUrl: videoUrl.trim(),
     });
 
-    alert("Room creation data saved successfully")
+    // alert("Room creation data saved successfully")
 
     setIsDeploying(true);
     // Simulate room deployment, then navigate to the correct room type
