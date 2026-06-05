@@ -72,13 +72,14 @@ io.on("connection", (socket) => {
       });
     }
 
-    // ── Create the system message ──
+    // ── Create and store the system message ──
     const joinMsg = {
       id: Date.now(),
       type: "system",
       text: `${currentUser} joined the room`,
       timestamp: new Date().toISOString(),
     };
+    pushMessage(roomId, joinMsg);
 
     // Notify everyone in the room (including sender)
     io.to(roomId).emit("user-joined", {
@@ -94,11 +95,11 @@ io.on("connection", (socket) => {
   });
 
   // User sends a message
-  socket.on("send-message", ({ roomId, text, userName, socketId }) => {
+  socket.on("send-message", ({ roomId, text, userName }) => {
     const message = {
       id: Date.now(),
       type: "chat",
-      socketId,
+      socketId: socket.id,
       user: userName || "Anonymous",
       text,
       timestamp: new Date().toISOString(),
@@ -155,13 +156,14 @@ io.on("connection", (socket) => {
       users.delete(socket.id);
       const onlineCount = users.size;
 
-      // Create the system message
+      // Create and store the system message
       const leaveMsg = {
         id: Date.now() + 1,
         type: "system",
         text: `${currentUser} left the room`,
         timestamp: new Date().toISOString(),
       };
+      pushMessage(currentRoom, leaveMsg);
 
       // Notify remaining users
       io.to(currentRoom).emit("user-left", {

@@ -373,10 +373,9 @@ export default function RoomPage() {
       roomId,
       text: newMsg.trim(),
       userName,
-      socketId: mySocketId,
     });
     setNewMsg("");
-  }, [newMsg, roomId, userName, mySocketId]);
+  }, [newMsg, roomId, userName]);
 
   const triggerReaction = (emoji: string) => {
     setActiveReaction(emoji);
