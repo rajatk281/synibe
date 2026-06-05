@@ -211,6 +211,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, "0.0.0.0", () => {
+httpServer.listen(PORT, "", () => {
   console.log(`\n🔌 Socket.io server running on http://0.0.0.0:${PORT}\n`);
 });
