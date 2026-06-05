@@ -1,0 +1,1 @@
+ALTER TABLE "rooms" ADD COLUMN "Video URL" text DEFAULT '' NOT NULL;

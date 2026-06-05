@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight, RefreshCw, Loader2 } from "lucide-react";
+import { ArrowRight, RefreshCw, Loader2, Link2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { createRoom } from "./actions";
 
@@ -21,6 +21,8 @@ function NewRoomContent() {
   const mode = searchParams.get("mode") || "watch";
   const [roomName, setRoomName] = useState("");
   const [roomNameError, setRoomNameError] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoUrlError, setVideoUrlError] = useState(false);
   const [accessHash, setAccessHash] = useState("");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [participants, setParticipants] = useState(12);
@@ -36,13 +38,19 @@ function NewRoomContent() {
       setRoomNameError(true);
       return;
     }
+    if (!videoUrl.trim()) {
+      setVideoUrlError(true);
+      return;
+    }
     setRoomNameError(false);
+    setVideoUrlError(false);
     await createRoom({
       destName: roomName,
       accessHash: accessHash,
       visibility: visibility,
       participantLimit: participants,
-      creatorId: session?.user?.id!
+      creatorId: session?.user?.id || "anonymous",
+      videoUrl: videoUrl.trim(),
     });
 
     alert("Room creation data saved successfully")
@@ -239,6 +247,41 @@ function NewRoomContent() {
                   <span>Constraints ← Adjusted</span>
                 </div>
               </div>
+            </div>
+
+            {/* 05. Video URL */}
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
+                <span className="text-purple-400">05.</span> Video / Stream URL
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 flex-shrink-0">
+                  <Link2 className="w-4 h-4" />
+                </div>
+                <input
+                  id="video-url-input"
+                  type="url"
+                  placeholder="PASTE VIDEO LINK HERE..."
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    if (e.target.value.trim()) setVideoUrlError(false);
+                  }}
+                  className={`w-full bg-transparent border rounded-xl py-3.5 px-4 text-white placeholder-slate-600 text-sm font-medium tracking-wider focus:outline-none transition-all duration-300 ${
+                    videoUrlError
+                      ? "border-red-500/60 focus:border-red-500/80 focus:ring-1 focus:ring-red-500/20"
+                      : "border-white/[0.08] focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+                  }`}
+                />
+              </div>
+              {videoUrlError && (
+                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-red-400/80">
+                  ⚠ A video link is required to deploy
+                </p>
+              )}
+              <p className="mt-2 text-[10px] text-slate-600 font-medium tracking-wide">
+                Supports direct video links (.mp4, .webm) and public URLs
+              </p>
             </div>
 
             {/* Deploy Room button */}

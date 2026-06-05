@@ -10,6 +10,7 @@ export async function createRoom(data: {
   visibility: "public" | "private";
   participantLimit: number;
   creatorId: string;
+  videoUrl: string;
 }) {
   await db.insert(rooms).values({
     destName: data.destName,
@@ -17,6 +18,7 @@ export async function createRoom(data: {
     visibility: data.visibility,
     participantLimit: data.participantLimit,
     creatorId: data.creatorId,
+    videoUrl: data.videoUrl,
   });
 
   return { success: true };

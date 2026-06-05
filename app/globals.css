@@ -245,3 +245,14 @@ p {
              sync-toast-fade 3s ease-in-out forwards;
 }
 
+/* ------------------ YOUTUBE EMBED FILL ------------------ */
+#yt-player-target {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#yt-player-target iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+}

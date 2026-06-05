@@ -6,7 +6,7 @@ export const rooms = pgTable("rooms", {
   accessHash: text("Access Hash").notNull(),
   visibility: text("visibility", {enum: ["public", "private"]}).notNull().default("private"),
   participantLimit: integer("Participant Limit").notNull().default(10),
-  creatorId: text("Creator ID").notNull()
-
- 
+  creatorId: text("Creator ID").notNull(),
+  videoUrl: text("Video URL").notNull().default(""),
 });
+

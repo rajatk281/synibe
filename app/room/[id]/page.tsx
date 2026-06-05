@@ -53,6 +53,23 @@ function formatVideoTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
+/* ── YouTube URL detection ── */
+function getYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: (() => void) | undefined;
+  }
+}
+
 export default function RoomPage() {
   const params = useParams();
   const roomId = params?.id as string;
@@ -76,6 +93,9 @@ export default function RoomPage() {
   const [syncToasts, setSyncToasts] = useState<SyncToast[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFullscreenChat, setShowFullscreenChat] = useState(true);
+  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [roomName, setRoomName] = useState<string>("");
+  const [roomLoading, setRoomLoading] = useState(true);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -85,6 +105,12 @@ export default function RoomPage() {
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const fullscreenChatEndRef = useRef<HTMLDivElement>(null);
+  const ytPlayerRef = useRef<any>(null);
+  const ytTimeUpdateRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /* ── Derived: is this a YouTube URL? ── */
+  const youtubeId = getYouTubeVideoId(videoUrl);
+  const isYouTube = !!youtubeId;
 
   /* ── Helper: show a sync toast ── */
   const showSyncToast = useCallback((text: string) => {
@@ -94,6 +120,108 @@ export default function RoomPage() {
       setSyncToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
   }, []);
+
+  /* ── Fetch room data from API ── */
+  useEffect(() => {
+    async function fetchRoom() {
+      try {
+        const res = await fetch(`/api/room/${roomId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setVideoUrl(data.videoUrl || "");
+          setRoomName(data.destName || "");
+        }
+      } catch (err) {
+        console.error("Failed to fetch room data:", err);
+      } finally {
+        setRoomLoading(false);
+      }
+    }
+    if (roomId) fetchRoom();
+  }, [roomId]);
+
+  /* ── YouTube IFrame API ── */
+  useEffect(() => {
+    if (!youtubeId || roomLoading) return;
+
+    function createPlayer() {
+      if (ytPlayerRef.current) {
+        try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
+        ytPlayerRef.current = null;
+      }
+
+      ytPlayerRef.current = new window.YT.Player("yt-player-target", {
+        videoId: youtubeId,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          fs: 0,
+          iv_load_policy: 3,
+          disablekb: 1,
+          playsinline: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onReady: (event: any) => {
+            event.target.mute();
+            setDuration(event.target.getDuration());
+            setIsPlaying(true);
+
+            // Poll current time since YT has no native timeupdate
+            if (ytTimeUpdateRef.current) clearInterval(ytTimeUpdateRef.current);
+            ytTimeUpdateRef.current = setInterval(() => {
+              if (ytPlayerRef.current?.getCurrentTime) {
+                setCurrentTime(ytPlayerRef.current.getCurrentTime());
+                // Also keep duration updated (YT reports 0 initially)
+                const dur = ytPlayerRef.current.getDuration();
+                if (dur > 0) setDuration(dur);
+              }
+            }, 250);
+          },
+          onStateChange: (event: any) => {
+            const s = event.data;
+            if (s === window.YT.PlayerState.PLAYING) {
+              if (!isRemoteAction.current) setIsPlaying(true);
+            } else if (s === window.YT.PlayerState.PAUSED) {
+              if (!isRemoteAction.current) setIsPlaying(false);
+            } else if (s === window.YT.PlayerState.ENDED) {
+              // Loop: restart
+              ytPlayerRef.current?.seekTo(0);
+              ytPlayerRef.current?.playVideo();
+            }
+          },
+        },
+      });
+    }
+
+    // Load the IFrame API script if needed
+    if (window.YT?.Player) {
+      createPlayer();
+    } else {
+      if (!document.getElementById("yt-iframe-api")) {
+        const tag = document.createElement("script");
+        tag.id = "yt-iframe-api";
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
+      window.onYouTubeIframeAPIReady = createPlayer;
+    }
+
+    return () => {
+      if (ytTimeUpdateRef.current) {
+        clearInterval(ytTimeUpdateRef.current);
+        ytTimeUpdateRef.current = null;
+      }
+      if (ytPlayerRef.current) {
+        try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
+        ytPlayerRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [youtubeId, roomLoading]);
 
   /* ── Helper: emit video action ── */
   const emitVideoAction = useCallback(
@@ -230,21 +358,21 @@ export default function RoomPage() {
       currentTime: number;
       isPlaying: boolean;
     }) => {
-      const video = videoRef.current;
-      if (!video) return;
-
       isRemoteAction.current = true;
-      video.currentTime = time;
-      if (playing) {
-        video.play().catch(() => {});
-        setIsPlaying(true);
+
+      if (ytPlayerRef.current?.seekTo) {
+        ytPlayerRef.current.seekTo(time, true);
+        if (playing) { ytPlayerRef.current.playVideo(); setIsPlaying(true); }
+        else { ytPlayerRef.current.pauseVideo(); setIsPlaying(false); }
       } else {
-        video.pause();
-        setIsPlaying(false);
+        const video = videoRef.current;
+        if (!video) { isRemoteAction.current = false; return; }
+        video.currentTime = time;
+        if (playing) { video.play().catch(() => {}); setIsPlaying(true); }
+        else { video.pause(); setIsPlaying(false); }
       }
-      setTimeout(() => {
-        isRemoteAction.current = false;
-      }, 200);
+
+      setTimeout(() => { isRemoteAction.current = false; }, 200);
     });
 
     // ── Remote user performed a video action ──
@@ -254,38 +382,50 @@ export default function RoomPage() {
       userName: string;
       socketId: string;
     }) => {
-      const video = videoRef.current;
-      if (!video) return;
-
       isRemoteAction.current = true;
 
-      switch (action) {
-        case "play":
-          video.currentTime = time;
-          video.play().catch(() => {});
-          setIsPlaying(true);
-          showSyncToast(`${who} resumed playback`);
-          break;
-        case "pause":
-          video.currentTime = time;
-          video.pause();
-          setIsPlaying(false);
-          showSyncToast(`${who} paused the video`);
-          break;
-        case "seek":
-        case "seek-while-playing":
-          video.currentTime = time;
-          if (action === "seek-while-playing") {
-            video.play().catch(() => {});
-            setIsPlaying(true);
-          }
-          showSyncToast(`${who} seeked to ${formatVideoTime(time)}`);
-          break;
+      const yt = ytPlayerRef.current;
+      const video = videoRef.current;
+
+      if (yt?.seekTo) {
+        // YouTube player
+        switch (action) {
+          case "play":
+            yt.seekTo(time, true); yt.playVideo(); setIsPlaying(true);
+            showSyncToast(`${who} resumed playback`);
+            break;
+          case "pause":
+            yt.seekTo(time, true); yt.pauseVideo(); setIsPlaying(false);
+            showSyncToast(`${who} paused the video`);
+            break;
+          case "seek":
+          case "seek-while-playing":
+            yt.seekTo(time, true);
+            if (action === "seek-while-playing") { yt.playVideo(); setIsPlaying(true); }
+            showSyncToast(`${who} seeked to ${formatVideoTime(time)}`);
+            break;
+        }
+      } else if (video) {
+        // Native video player
+        switch (action) {
+          case "play":
+            video.currentTime = time; video.play().catch(() => {}); setIsPlaying(true);
+            showSyncToast(`${who} resumed playback`);
+            break;
+          case "pause":
+            video.currentTime = time; video.pause(); setIsPlaying(false);
+            showSyncToast(`${who} paused the video`);
+            break;
+          case "seek":
+          case "seek-while-playing":
+            video.currentTime = time;
+            if (action === "seek-while-playing") { video.play().catch(() => {}); setIsPlaying(true); }
+            showSyncToast(`${who} seeked to ${formatVideoTime(time)}`);
+            break;
+        }
       }
 
-      setTimeout(() => {
-        isRemoteAction.current = false;
-      }, 200);
+      setTimeout(() => { isRemoteAction.current = false; }, 200);
     });
 
     return () => {
@@ -348,12 +488,25 @@ export default function RoomPage() {
 
     if (isPlaying && socketRef.current && connected) {
       heartbeatRef.current = setInterval(() => {
-        const video = videoRef.current;
-        if (!video || !socketRef.current) return;
+        if (!socketRef.current) return;
+
+        let time = 0;
+        let playing = false;
+
+        if (ytPlayerRef.current?.getCurrentTime) {
+          time = ytPlayerRef.current.getCurrentTime();
+          playing = ytPlayerRef.current.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+        } else {
+          const video = videoRef.current;
+          if (!video) return;
+          time = video.currentTime;
+          playing = !video.paused;
+        }
+
         socketRef.current.emit("video-heartbeat", {
           roomId,
-          currentTime: video.currentTime,
-          isPlaying: !video.paused,
+          currentTime: time,
+          isPlaying: playing,
         });
       }, HEARTBEAT_INTERVAL);
     }
@@ -383,39 +536,61 @@ export default function RoomPage() {
   };
 
   const togglePlay = () => {
+    const yt = ytPlayerRef.current;
     const video = videoRef.current;
-    if (!video) return;
 
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-      emitVideoAction("pause", video.currentTime);
-    } else {
-      video.play().catch(() => {});
-      setIsPlaying(true);
-      emitVideoAction("play", video.currentTime);
+    if (yt?.playVideo) {
+      const time = yt.getCurrentTime?.() ?? 0;
+      if (isPlaying) {
+        yt.pauseVideo();
+        setIsPlaying(false);
+        emitVideoAction("pause", time);
+      } else {
+        yt.playVideo();
+        setIsPlaying(true);
+        emitVideoAction("play", time);
+      }
+    } else if (video) {
+      if (isPlaying) {
+        video.pause();
+        setIsPlaying(false);
+        emitVideoAction("pause", video.currentTime);
+      } else {
+        video.play().catch(() => {});
+        setIsPlaying(true);
+        emitVideoAction("play", video.currentTime);
+      }
     }
   };
 
   const toggleMute = () => {
-    setIsMuted((m) => !m);
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
+    const yt = ytPlayerRef.current;
+    if (yt?.mute) {
+      if (isMuted) { yt.unMute(); } else { yt.mute(); }
+      setIsMuted(!isMuted);
+    } else {
+      setIsMuted((m) => !m);
+      if (videoRef.current) {
+        videoRef.current.muted = !isMuted;
+      }
     }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const bar = progressBarRef.current;
-    const video = videoRef.current;
-    if (!bar || !video || !duration) return;
+    if (!bar || !duration) return;
 
     const rect = bar.getBoundingClientRect();
     const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const seekTime = fraction * duration;
 
-    video.currentTime = seekTime;
-    setCurrentTime(seekTime);
+    if (ytPlayerRef.current?.seekTo) {
+      ytPlayerRef.current.seekTo(seekTime, true);
+    } else if (videoRef.current) {
+      videoRef.current.currentTime = seekTime;
+    }
 
+    setCurrentTime(seekTime);
     const action = isPlaying ? "seek-while-playing" : "seek";
     emitVideoAction(action, seekTime);
   };
@@ -441,21 +616,62 @@ export default function RoomPage() {
       <div className="flex-1 flex flex-col relative">
         {/* Video container */}
         <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black">
-          <video
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            src="/Videos/Stranger_Things.mp4"
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-            onPlay={() => {
-              if (!isRemoteAction.current) setIsPlaying(true);
-            }}
-            onPause={() => {
-              if (!isRemoteAction.current) setIsPlaying(false);
-            }}
-          />
+          {/* Conditional: YouTube embed or native <video> */}
+          {isYouTube ? (
+            <div className="absolute inset-0 w-full h-full">
+              <div
+                id="yt-player-target"
+                className="w-full h-full"
+              />
+              {/* Transparent overlay to block YT clickjacking and let our controls work */}
+              <div className="absolute inset-0 z-[1]" />
+            </div>
+          ) : (
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover"
+              src={videoUrl || undefined}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              onPlay={() => {
+                if (!isRemoteAction.current) setIsPlaying(true);
+              }}
+              onPause={() => {
+                if (!isRemoteAction.current) setIsPlaying(false);
+              }}
+            />
+          )}
+
+          {/* Loading overlay while fetching room data */}
+          {roomLoading && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#060612]">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-white/40">
+                  Loading room...
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* No video URL fallback */}
+          {!roomLoading && !videoUrl && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#060612]">
+              <div className="flex flex-col items-center gap-3 text-center px-6">
+                <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center">
+                  <Play className="w-7 h-7 text-purple-400/60" />
+                </div>
+                <p className="text-sm font-semibold text-white/50">
+                  No video URL configured for this room
+                </p>
+                <p className="text-xs text-white/30">
+                  The host needs to provide a video link when creating the room
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* ── Fullscreen Floating Chat Panel ── */}
           {isFullscreen && showFullscreenChat && (
@@ -557,9 +773,8 @@ export default function RoomPage() {
           <div className="absolute top-5 left-5 z-20">
             <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
               <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                Neon Nights
-              </span>{" "}
-              <span className="text-white/60 font-normal">Ep. 04</span>
+                {roomName || "Untitled Room"}
+              </span>
             </h2>
             <div className="flex items-center gap-1.5 mt-1">
               <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
