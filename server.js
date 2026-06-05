@@ -1,8 +1,24 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-const PORT = process.env.PORT ||3001;
-const httpServer = createServer();
+const PORT = process.env.PORT || 3001;
+
+// HTTP server (required for Render port detection)
+const httpServer = createServer((req, res) => {
+  if (req.url === "/" || req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        service: "Synibe Socket Server",
+      })
+    );
+    return;
+  }
+
+  res.writeHead(404);
+  res.end("Not Found");
+});
 
 const io = new Server(httpServer, {
   cors: {
@@ -18,10 +34,10 @@ const io = new Server(httpServer, {
 // Track users per room: roomId -> Map<socketId, userName>
 const roomUsers = new Map();
 
-// Message history per room: roomId -> ChatMessage[] (capped at 100)
+// Message history per room
 const roomMessages = new Map();
 
-// Video state per room: roomId -> { currentTime, isPlaying, lastUpdated, updatedBy }
+// Video state per room
 const roomVideoState = new Map();
 
 const MAX_MESSAGES = 100;
@@ -30,42 +46,45 @@ function pushMessage(roomId, message) {
   if (!roomMessages.has(roomId)) {
     roomMessages.set(roomId, []);
   }
+
   const history = roomMessages.get(roomId);
   history.push(message);
-  // Cap at MAX_MESSAGES
+
   if (history.length > MAX_MESSAGES) {
     history.splice(0, history.length - MAX_MESSAGES);
   }
 }
 
 io.on("connection", (socket) => {
+  console.log(`✅ Connected: ${socket.id}`);
+
   let currentRoom = null;
   let currentUser = null;
 
-  // User joins a room
+  // User joins room
   socket.on("join-room", ({ roomId, userName }) => {
     currentRoom = roomId;
     currentUser = userName || "Anonymous";
 
     socket.join(roomId);
 
-    // Track this user in the room
     if (!roomUsers.has(roomId)) {
       roomUsers.set(roomId, new Map());
     }
+
     roomUsers.get(roomId).set(socket.id, currentUser);
 
     const onlineCount = roomUsers.get(roomId).size;
 
-    // ── Send message history to the joining socket ──
     const history = roomMessages.get(roomId) || [];
     socket.emit("message-history", history);
 
-    // ── Send current video state to the joining socket ──
     const videoState = roomVideoState.get(roomId);
+
     if (videoState) {
-      // Estimate current position based on elapsed time since last update
-      const elapsed = (Date.now() - videoState.lastUpdated) / 1000;
+      const elapsed =
+        (Date.now() - videoState.lastUpdated) / 1000;
+
       const estimatedTime = videoState.isPlaying
         ? videoState.currentTime + elapsed
         : videoState.currentTime;
@@ -76,29 +95,29 @@ io.on("connection", (socket) => {
       });
     }
 
-    // ── Create and store the system message ──
     const joinMsg = {
       id: Date.now(),
       type: "system",
       text: `${currentUser} joined the room`,
       timestamp: new Date().toISOString(),
     };
+
     pushMessage(roomId, joinMsg);
 
-    // Notify everyone in the room (including sender)
     io.to(roomId).emit("user-joined", {
       userName: currentUser,
       socketId: socket.id,
       message: joinMsg,
     });
 
-    // Broadcast updated count
     io.to(roomId).emit("online-count", onlineCount);
 
-    console.log(`[${roomId}] ${currentUser} joined. Online: ${onlineCount}`);
+    console.log(
+      `[${roomId}] ${currentUser} joined. Online: ${onlineCount}`
+    );
   });
 
-  // User sends a message
+  // Chat messages
   socket.on("send-message", ({ roomId, text, userName }) => {
     const message = {
       id: Date.now(),
@@ -108,100 +127,107 @@ io.on("connection", (socket) => {
       text,
       timestamp: new Date().toISOString(),
     };
-    // Store in history
+
     pushMessage(roomId, message);
-    // Broadcast to everyone in the room
+
     io.to(roomId).emit("new-message", message);
   });
 
-  // ═══════════════════════════════════════════════
-  //  VIDEO SYNC EVENTS
-  // ═══════════════════════════════════════════════
+  // Video actions
+  socket.on(
+    "video-action",
+    ({ roomId, action, currentTime, userName }) => {
+      roomVideoState.set(roomId, {
+        currentTime,
+        isPlaying:
+          action === "play" ||
+          action === "seek-while-playing",
+        lastUpdated: Date.now(),
+        updatedBy: socket.id,
+      });
 
-  // A user performed a video action (play, pause, seek)
-  socket.on("video-action", ({ roomId, action, currentTime, userName }) => {
-    // Update the authoritative room state
-    roomVideoState.set(roomId, {
-      currentTime,
-      isPlaying: action === "play" || action === "seek-while-playing",
-      lastUpdated: Date.now(),
-      updatedBy: socket.id,
-    });
+      socket.to(roomId).emit("video-sync", {
+        action,
+        currentTime,
+        userName: userName || "Someone",
+        socketId: socket.id,
+      });
 
-    // Broadcast to all OTHER sockets in the room
-    socket.to(roomId).emit("video-sync", {
-      action,
-      currentTime,
-      userName: userName || "Someone",
-      socketId: socket.id,
-    });
+      console.log(
+        `[${roomId}] ${userName} → ${action} @ ${currentTime.toFixed(
+          1
+        )}s`
+      );
+    }
+  );
 
-    console.log(
-      `[${roomId}] ${userName} → video-action: ${action} @ ${currentTime.toFixed(1)}s`
-    );
-  });
+  socket.on(
+    "video-heartbeat",
+    ({ roomId, currentTime, isPlaying }) => {
+      roomVideoState.set(roomId, {
+        currentTime,
+        isPlaying,
+        lastUpdated: Date.now(),
+        updatedBy: socket.id,
+      });
+    }
+  );
 
-  // Periodic heartbeat to keep room state fresh (sent by the "oldest" connected client)
-  socket.on("video-heartbeat", ({ roomId, currentTime, isPlaying }) => {
-    roomVideoState.set(roomId, {
-      currentTime,
-      isPlaying,
-      lastUpdated: Date.now(),
-      updatedBy: socket.id,
-    });
-  });
-
-  // ═══════════════════════════════════════════════
-  //  ADMISSION CONTROL EVENTS
-  // ═══════════════════════════════════════════════
-
-  // Guest requests to join a private room
+  // Join request
   socket.on("request-join", ({ roomId, userName }) => {
-    // Broadcast join-request to the room (intended for the host to intercept)
     io.to(roomId).emit("join-request", {
       socketId: socket.id,
       userName: userName || "Anonymous",
     });
   });
 
-  // Host responds to a join request
+  // Join approval
   socket.on("respond-join", ({ targetSocketId, approved }) => {
-    // Send response specifically to the waiting guest
-    io.to(targetSocketId).emit("join-response", approved);
+    io.to(targetSocketId).emit(
+      "join-response",
+      approved
+    );
   });
 
-  // User disconnects
+  // Disconnect
   socket.on("disconnect", () => {
     if (!currentRoom || !currentUser) return;
 
     const users = roomUsers.get(currentRoom);
+
     if (users) {
       users.delete(socket.id);
+
       const onlineCount = users.size;
 
-      // Create and store the system message
       const leaveMsg = {
         id: Date.now() + 1,
         type: "system",
         text: `${currentUser} left the room`,
         timestamp: new Date().toISOString(),
       };
+
       pushMessage(currentRoom, leaveMsg);
 
-      // Notify remaining users
       io.to(currentRoom).emit("user-left", {
         userName: currentUser,
         socketId: socket.id,
         message: leaveMsg,
       });
-      io.to(currentRoom).emit("online-count", onlineCount);
 
-      // Clean up room data if empty
+      io.to(currentRoom).emit(
+        "online-count",
+        onlineCount
+      );
+
       if (users.size === 0) {
         roomUsers.delete(currentRoom);
         roomMessages.delete(currentRoom);
         roomVideoState.delete(currentRoom);
-        console.log(`[${currentRoom}] Room empty. Cleaned up state.`);
+
+        console.log(
+          `[${currentRoom}] Room empty. Cleaned up state.`
+        );
       }
 
       console.log(
@@ -211,6 +237,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, "", () => {
-  console.log(`\n🔌 Socket.io server running on http://0.0.0.0:${PORT}\n`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server listening on port ${PORT}`);
+  console.log(`🔌 Socket.IO ready`);
 });
