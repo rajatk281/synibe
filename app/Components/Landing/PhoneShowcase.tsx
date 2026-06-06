@@ -107,9 +107,9 @@ export default function PhoneShowcase() {
   /* ── Mobile Layout (static, no GSAP pinning) ── */
   if (isMobile) {
     return (
-      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 border">
+      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 ">
         {/* Video Section */}
-        <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 border">
+        <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 ">
           <div className="flex items-center gap-3 mb-4 ">
             <div
               className="w-8 h-[2px]"
@@ -133,7 +133,7 @@ export default function PhoneShowcase() {
             with friends — no matter where they are.
           </p>
 
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-2">
             {videoFeatures.map((f) => (
               <FeatureCard key={f.title} f={f} />
             ))}
@@ -141,7 +141,7 @@ export default function PhoneShowcase() {
         </div>
 
         {/* Audio Section */}
-        <div className="max-w-lg mx-auto px-5 sm:px-6 border">
+        <div className="max-w-lg mx-auto px-5 sm:px-6 ">
           <div className="flex items-center gap-3 mb-4">
             <div
               className="w-8 h-[2px]"
@@ -165,7 +165,7 @@ export default function PhoneShowcase() {
             moment — together, anywhere in the world.
           </p>
 
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-2">
             {audioFeatures.map((f) => (
               <FeatureCard key={f.title} f={f} />
             ))}
@@ -174,7 +174,7 @@ export default function PhoneShowcase() {
 
         {/* Ambient glow */}
         <div
-          className="absolute pointer-events-none z-0 border"
+          className="absolute pointer-events-none z-0 "
           style={{
             width: 300,
             height: 300,
@@ -222,7 +222,7 @@ export default function PhoneShowcase() {
           with friends — no matter where they are.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {videoFeatures.map((f) => (
             <FeatureCard key={f.title} f={f} />
           ))}
@@ -317,7 +317,7 @@ export default function PhoneShowcase() {
           moment — together, anywhere in the world.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {audioFeatures.map((f) => (
             <FeatureCard key={f.title} f={f} />
           ))}
