@@ -45,13 +45,13 @@ export default function CreateRoomPage() {
   }, [showStreamModal]);
 
   return (
-    <div className="h-screen bg-black relative overflow-hidden ">
+    <div className="min-h-screen lg:h-screen bg-black relative overflow-hidden ">
       {/* Subtle ambient glow */}
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-amber-600/5 rounded-full blur-[180px] pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-10 pb-20 ">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-6 sm:pt-10 pb-10 sm:pb-20 ">
         {/* Section label */}
         <div className="flex items-center gap-3 mb-6 ">
           <div className="w-12 h-px bg-gradient-to-r from-orange-500 to-transparent" />
@@ -61,7 +61,7 @@ export default function CreateRoomPage() {
         </div>
 
         {/* Main heading */}
-        <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-[1.05] tracking-tight mb-16 max-w-2xl">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold text-white leading-[1.05] tracking-tight mb-8 sm:mb-16 max-w-2xl">
           What do you want to{" "}
           <br />
           <em className="not-italic bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent italic">
@@ -202,7 +202,7 @@ export default function CreateRoomPage() {
 
           {/* Large faded background text */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-            <div className="text-[12vw] md:text-[10vw] font-black uppercase leading-none tracking-tighter text-white/[0.03] text-center whitespace-nowrap">
+            <div className="text-[10vw] sm:text-[8vw] md:text-[10vw] font-black uppercase leading-none tracking-tighter text-white/[0.03] text-center whitespace-nowrap">
               {streamMode === "watch" ? "WATCH" : "LISTEN"}
               <br />
               TOGETHER.
@@ -219,9 +219,9 @@ export default function CreateRoomPage() {
           </button>
 
           {/* Modal content */}
-          <div className="relative z-10 w-full max-w-4xl mx-auto px-6 stream-modal-content">
+          <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 stream-modal-content">
             {/* Two options side by side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-16 md:gap-24 items-center">
               {/* ── Create a Room ── */}
               <Link
                 href={`/create-room/new?mode=${streamMode}`}
@@ -243,7 +243,7 @@ export default function CreateRoomPage() {
                 </span>
 
                 {/* Title */}
-                <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight group-hover:text-purple-100 transition-colors duration-300">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight group-hover:text-purple-100 transition-colors duration-300">
                   Create a Room
                 </h2>
               </Link>
@@ -269,7 +269,7 @@ export default function CreateRoomPage() {
                 </span>
 
                 {/* Title */}
-                <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight group-hover:text-pink-100 transition-colors duration-300">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight group-hover:text-pink-100 transition-colors duration-300">
                   Join a Room
                 </h2>
               </Link>

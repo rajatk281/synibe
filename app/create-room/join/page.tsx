@@ -105,7 +105,7 @@ function JoinRoomContent() {
         </span>
 
         {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center leading-tight tracking-tight mb-10">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center leading-tight tracking-tight mb-6 sm:mb-10">
           Enter your
           <br />
           <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
@@ -114,13 +114,13 @@ function JoinRoomContent() {
         </h1>
 
         {/* Code Input Area */}
-        <div className="w-full rounded-2xl border border-white/[0.06] bg-[#0c0c0e] p-6 md:p-8 mb-5">
-          <div className="flex items-center justify-center gap-1.5 md:gap-2" onPaste={handlePaste}>
+        <div className="w-full rounded-2xl border border-white/[0.06] bg-[#0c0c0e] p-2 sm:p-6 md:p-8 mb-5 overflow-hidden">
+          <div className="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2" onPaste={handlePaste}>
             {code.map((char, i) => (
-              <div key={i} className="flex items-center gap-1.5 md:gap-2">
+              <div key={i} className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
                 {/* Separator dash after index 3 */}
                 {i === 4 && (
-                  <span className="text-3xl md:text-4xl font-light text-white/20 mx-1 md:mx-2 select-none">
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-light text-white/20 mx-0.5 sm:mx-1 md:mx-2 select-none">
                     –
                   </span>
                 )}
@@ -132,7 +132,7 @@ function JoinRoomContent() {
                   value={char}
                   onChange={(e) => handleChange(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
-                  className={`w-10 h-14 md:w-12 md:h-16 rounded-lg border text-center text-2xl md:text-3xl font-black uppercase tracking-widest transition-all duration-300 bg-transparent outline-none
+                  className={`w-7 h-10 sm:w-10 sm:h-14 md:w-12 md:h-16 rounded-lg border text-center text-lg sm:text-2xl md:text-3xl font-black uppercase tracking-widest transition-all duration-300 bg-transparent outline-none
                     ${char
                       ? "border-orange-500/30 text-white shadow-[0_0_12px_rgba(251,146,60,0.1)]"
                       : "border-white/[0.08] text-white/30"

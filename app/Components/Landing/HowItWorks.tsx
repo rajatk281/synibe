@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -35,8 +35,18 @@ const HowItWorks = () => {
   const stepsBoxRef = useRef<HTMLDivElement>(null);
   const stepItemsRef = useRef<(HTMLDivElement | null)[]>([]);
   const lineRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Skip GSAP pinning on mobile
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -108,8 +118,115 @@ const HowItWorks = () => {
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile]);
 
+  /* ── Mobile Layout ── */
+  if (isMobile) {
+    return (
+      <section
+        id="how-it-works"
+        className="relative w-full overflow-hidden bg-black py-16 sm:py-24"
+      >
+        <div className="max-w-lg mx-auto px-5 sm:px-6">
+          {/* Heading */}
+          <div className="mb-10 sm:mb-14">
+            <div
+              className="relative border border-white/10 p-6 sm:p-8"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              {/* Corner accents */}
+              <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/30" />
+              <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/30" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-white/30" />
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/30" />
+
+              <h2 className="text-3xl sm:text-4xl font-semibold text-white leading-tight text-center">
+                Start vibing together
+                <br />
+                in just few steps.
+              </h2>
+            </div>
+          </div>
+
+          {/* Steps */}
+          <div className="w-full max-w-md mx-auto space-y-4 sm:space-y-5">
+            {/* Section label */}
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div
+                className="w-8 h-[2px]"
+                style={{
+                  background: "linear-gradient(90deg, var(--accent), var(--accent-soft))",
+                }}
+              />
+              <span className="text-sm font-medium tracking-widest uppercase text-white/50">
+                Getting Started
+              </span>
+            </div>
+
+            {/* Step cards */}
+            {steps.map((step, i) => (
+              <div
+                key={step.number}
+                className="group relative flex gap-4 sm:gap-5 items-start p-3 sm:p-4 rounded-xl transition-colors duration-300 hover:bg-white/[0.04]"
+              >
+                {/* Step number */}
+                <div
+                  className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-sm font-bold"
+                  style={{
+                    background: `linear-gradient(135deg, var(--accent), var(--accent-soft))`,
+                    color: "#fff",
+                    boxShadow: "0 0 20px rgba(var(--glow), 0.25)",
+                  }}
+                >
+                  {step.number}
+                </div>
+
+                {/* Step content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-1 group-hover:text-white/90 transition-colors">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-white/45 leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Connecting line to next step */}
+                {i < steps.length - 1 && (
+                  <div
+                    className="absolute left-[1.6rem] sm:left-[2.05rem] top-12 sm:top-14 w-[2px] h-4 sm:h-5"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(var(--glow), 0.3), transparent)",
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Subtle ambient glow */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            width: "300px",
+            height: "300px",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background:
+              "radial-gradient(circle, rgba(var(--glow), 0.06) 0%, transparent 70%)",
+          }}
+        />
+      </section>
+    );
+  }
+
+  /* ── Desktop Layout (GSAP pinned) ── */
   return (
     <section
       id="how-it-works"

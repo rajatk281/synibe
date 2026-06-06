@@ -485,7 +485,7 @@ export default function PricingSection() {
         {/* Billing toggle */}
         <div
           ref={toggleRef}
-          className="relative z-10 flex items-center justify-center gap-4 mb-16"
+          className="relative z-10 flex flex-wrap items-center justify-center gap-4 mb-16"
           style={{ opacity: 0 }}
         >
           <span className={`text-sm transition-colors duration-300 ${!isAnnual ? "text-white" : "text-white/40"}`}>
@@ -823,9 +823,10 @@ export default function PricingSection() {
               </span>
             </h2>
 
-            {/* Table */}
+            {/* Table — horizontally scrollable on mobile */}
+            <div className="overflow-x-auto -mx-2 px-2">
             <div
-              className="rounded-2xl overflow-hidden"
+              className="rounded-2xl overflow-hidden min-w-[600px]"
               style={{
                 background: "rgba(255,255,255,0.02)",
                 border: "1px solid rgba(255,255,255,0.06)",
@@ -893,6 +894,7 @@ export default function PricingSection() {
                   ))}
                 </div>
               ))}
+            </div>
             </div>
           </div>
         </div>

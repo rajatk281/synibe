@@ -73,14 +73,14 @@ function NewRoomContent() {
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-28 pb-20">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-20 sm:pt-28 pb-10 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 items-start">
 
           {/* ═══ LEFT COLUMN ═══ */}
           <div className="flex flex-col gap-6">
             {/* Character card */}
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden">
-              <div className="relative aspect-square max-h-[360px] overflow-hidden">
+              <div className="relative aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] overflow-hidden">
                 <Image
                   src="/wolf_avatar.png"
                   alt="Room Host Character"
@@ -107,7 +107,7 @@ function NewRoomContent() {
 
             {/* NEW SCENE heading */}
             <div>
-              <h1 className="text-5xl md:text-6xl font-black uppercase leading-none tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase leading-none tracking-tight">
                 <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">New</span>
                 <br />
                 <span className="text-white">Scene</span>
@@ -156,7 +156,7 @@ function NewRoomContent() {
                   <span className="text-purple-400">02.</span> Access Hash
                 </label>
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl md:text-3xl font-black text-white tracking-wider">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wider">
                     {accessHash}
                   </span>
                   <button

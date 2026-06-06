@@ -339,7 +339,7 @@ export default function AboutSection() {
           }}
         />
 
-        <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-32 pb-20">
+        <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center pt-24 sm:pt-32 pb-12 sm:pb-20">
           {/* Label */}
           <div className="flex items-center justify-center gap-3 mb-8" style={{ opacity: 0 }}>
             <div
@@ -357,7 +357,7 @@ export default function AboutSection() {
 
           {/* Title */}
           <h1
-            className="text-5xl sm:text-6xl lg:text-8xl font-bold text-white leading-[1.05] mb-6"
+            className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] mb-6"
             style={{ opacity: 0 }}
           >
             Built for the{" "}

@@ -91,6 +91,7 @@ export default function RoomPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showEmojis, setShowEmojis] = useState(false);
+  const [showMobileChat, setShowMobileChat] = useState(false);
   const [activeReaction, setActiveReaction] = useState<string | null>(null);
   const [onlineCount, setOnlineCount] = useState(0);
   const [mySocketId, setMySocketId] = useState<string | null>(null);
@@ -626,11 +627,11 @@ export default function RoomPage() {
 
   /* ── Render ── */
   return (
-    <div className="h-screen bg-[#060612] flex overflow-hidden">
+    <div className="h-screen bg-[#060612] flex flex-col lg:flex-row overflow-hidden">
       {/* ═══════════════════════════════════════════════ */}
       {/*  LEFT — Video Player Area                      */}
       {/* ═══════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col relative">
+      <div className="flex-1 flex flex-col relative min-h-0">
         {/* Video container */}
         <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black">
           {/* Conditional: YouTube embed or native <video> */}
@@ -646,7 +647,7 @@ export default function RoomPage() {
           ) : (
             <video
               ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover z-50"
               src={videoUrl || undefined}
               autoPlay
               loop
@@ -689,11 +690,6 @@ export default function RoomPage() {
               </div>
             </div>
           )}
-
-          <div>
-
-            hi
-          </div>
 
           {/* ── Fullscreen Floating Chat Panel ── */}
           {isFullscreen && showFullscreenChat && (
@@ -825,15 +821,15 @@ export default function RoomPage() {
           )}
 
           {/* ── Bottom controls ── */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 px-5 pb-4">
-            {/* Emoji reaction bar */}
-            <div className="flex items-center justify-center mb-3">
-              <div className="flex items-center gap-1 px-4 py-2 rounded-full bg-white/[0.08] backdrop-blur-xl border border-white/[0.06]">
+          <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-5 pb-3 sm:pb-4">
+            {/* Emoji reaction bar — hidden on small mobile, visible sm+ */}
+            <div className="hidden sm:flex items-center justify-center mb-3">
+              <div className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/[0.08] backdrop-blur-xl border border-white/[0.06]">
                 {EMOJI_REACTIONS.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => triggerReaction(emoji)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.1] hover:scale-125 transition-all duration-200 text-lg cursor-pointer"
+                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-white/[0.1] hover:scale-125 transition-all duration-200 text-base sm:text-lg cursor-pointer"
                   >
                     {emoji}
                   </button>
@@ -859,56 +855,67 @@ export default function RoomPage() {
 
             {/* Controls row */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   id="play-pause-btn"
                   onClick={togglePlay}
-                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
                 >
                   {isPlaying ? (
-                    <Pause className="w-4 h-4" />
+                    <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   ) : (
-                    <Play className="w-4 h-4 ml-0.5" />
+                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" />
                   )}
                 </button>
                 <button
                   id="mute-btn"
                   onClick={toggleMute}
-                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
                 >
                   {isMuted ? (
-                    <VolumeX className="w-4 h-4" />
+                    <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   ) : (
-                    <Volume2 className="w-4 h-4" />
+                    <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}
                 </button>
-                <span className="text-[11px] font-medium text-white/40 tracking-wide tabular-nums">
+                <span className="text-[10px] sm:text-[11px] font-medium text-white/40 tracking-wide tabular-nums">
                   {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Mobile chat toggle */}
+                <button
+                  onClick={() => setShowMobileChat(!showMobileChat)}
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer lg:hidden ${showMobileChat
+                      ? "bg-purple-500/25 border-purple-500/40 text-purple-300 hover:bg-purple-500/40"
+                      : "bg-white/[0.08] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.15]"
+                    }`}
+                  title={showMobileChat ? "Hide Chat" : "Show Chat"}
+                >
+                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
                 {isFullscreen && (
                   <button
                     id="toggle-fullscreen-chat-btn"
                     onClick={() => setShowFullscreenChat(!showFullscreenChat)}
-                    className={`w-9 h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${showFullscreenChat
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${showFullscreenChat
                         ? "bg-purple-500/25 border-purple-500/40 text-purple-300 hover:bg-purple-500/40"
                         : "bg-white/[0.08] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.15]"
                       }`}
                     title={showFullscreenChat ? "Hide Chat" : "Show Chat"}
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 )}
                 <button
                   id="fullscreen-btn"
                   onClick={toggleFullscreen}
-                  className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.08] flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[0.15] transition-all duration-300 cursor-pointer"
                 >
                   {isFullscreen ? (
-                    <Minimize2 className="w-4 h-4" />
+                    <Minimize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   ) : (
-                    <Maximize2 className="w-4 h-4" />
+                    <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}
                 </button>
               </div>
@@ -917,8 +924,8 @@ export default function RoomPage() {
         </div>
       </div>
 
-      <div className="fixed z-50 p right-5/19 mt-6 px-4 py-1 ">
-        <Button onClick={()=>{handleExitBtn()}} className="hover:cursor-pointer font-semibold hover:scale-105 p-5 transition-all bg-red-500 duration-300">Leave</Button>
+      <div className="fixed z-50 top-2 right-2 sm:top-auto sm:right-5/19 sm:mt-6 px-2 sm:px-4 py-1">
+        <Button onClick={()=>{handleExitBtn()}} className="hover:cursor-pointer font-semibold hover:scale-105 p-3 sm:p-5 text-xs sm:text-sm transition-all bg-red-500 duration-300">Leave</Button>
       </div>
       {ExitBtn && (
   <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -971,7 +978,7 @@ export default function RoomPage() {
       {/* ═══════════════════════════════════════════════ */}
       {/*  RIGHT — Chat Panel                            */}
       {/* ═══════════════════════════════════════════════ */}
-      <div className="w-[340px] lg:w-[380px] flex flex-col bg-[#0a0a14] border-l border-white/[0.06]">
+      <div className={`${showMobileChat ? 'flex' : 'hidden'} lg:flex w-full lg:w-[340px] xl:w-[380px] flex-col bg-[#0a0a14] border-t lg:border-t-0 lg:border-l border-white/[0.06] h-[50vh] lg:h-auto`}>
         {/* Chat header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">

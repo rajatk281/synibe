@@ -225,7 +225,7 @@ export default function ContactSection() {
           }}
         />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-20">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-20">
           <div className="flex flex-col lg:flex-row gap-16 items-start">
             {/* Left — Hero text */}
             <div ref={heroRef} className="flex-1 min-w-0 lg:pt-8">
@@ -248,7 +248,7 @@ export default function ContactSection() {
 
               {/* Title */}
               <h1
-                className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6"
+                className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-6"
                 style={{ opacity: 0 }}
               >
                 Got something

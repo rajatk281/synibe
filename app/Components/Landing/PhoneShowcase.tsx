@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
@@ -28,8 +28,18 @@ export default function PhoneShowcase() {
   const video2Ref = useRef<HTMLVideoElement>(null);
   const content1Ref = useRef<HTMLDivElement>(null);
   const content2Ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Skip GSAP on mobile
+
     const section = sectionRef.current;
     const phone = phoneRef.current;
     const v1 = video1Ref.current;
@@ -73,8 +83,112 @@ export default function PhoneShowcase() {
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile]);
 
+  /* ── Feature Card Component ── */
+  const FeatureCard = ({ f }: { f: { title: string; desc: string; icon: string } }) => (
+    <div className="flex items-start gap-3 sm:gap-4 ">
+      <div
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-base sm:text-lg shrink-0"
+        style={{
+          background: "rgba(136,41,224,0.15)",
+          border: "1px solid rgba(136,41,224,0.25)",
+        }}
+      >
+        {f.icon}
+      </div>
+      <div>
+        <h4 className="text-white font-semibold text-sm">{f.title}</h4>
+        <p className="text-white/40 text-xs sm:text-sm">{f.desc}</p>
+      </div>
+    </div>
+  );
+
+  /* ── Mobile Layout (static, no GSAP pinning) ── */
+  if (isMobile) {
+    return (
+      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 border">
+        {/* Video Section */}
+        <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 border">
+          <div className="flex items-center gap-3 mb-4 ">
+            <div
+              className="w-8 h-[2px]"
+              style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
+            />
+            <span className="text-sm font-medium tracking-widest uppercase text-white/50">
+              Watch Together
+            </span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+            Watch Together,
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Stay Connected
+            </span>
+          </h2>
+
+          <p className="text-white/50 text-sm sm:text-base mb-6 leading-relaxed">
+            Share your screen, sync your stream. Watch movies, series, and videos
+            with friends — no matter where they are.
+          </p>
+
+          <div className="space-y-3 sm:space-y-4">
+            {videoFeatures.map((f) => (
+              <FeatureCard key={f.title} f={f} />
+            ))}
+          </div>
+        </div>
+
+        {/* Audio Section */}
+        <div className="max-w-lg mx-auto px-5 sm:px-6 border">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-8 h-[2px]"
+              style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
+            />
+            <span className="text-sm font-medium tracking-widest uppercase text-white/50">
+              Listen Together
+            </span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+            Listen Together,
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Feel the Beat
+            </span>
+          </h2>
+
+          <p className="text-white/50 text-sm sm:text-base mb-6 leading-relaxed">
+            Sync your music sessions with anyone. Drop the same beat at the same
+            moment — together, anywhere in the world.
+          </p>
+
+          <div className="space-y-3 sm:space-y-4">
+            {audioFeatures.map((f) => (
+              <FeatureCard key={f.title} f={f} />
+            ))}
+          </div>
+        </div>
+
+        {/* Ambient glow */}
+        <div
+          className="absolute pointer-events-none z-0 border"
+          style={{
+            width: 300,
+            height: 300,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+            background: "radial-gradient(circle, rgba(var(--glow),0.2) 0%, transparent 70%)",
+          }}
+        />
+      </section>
+    );
+  }
+
+  /* ── Desktop Layout (GSAP pinned animation) ── */
   return (
     <section
       ref={sectionRef}
@@ -83,7 +197,7 @@ export default function PhoneShowcase() {
       {/* ── Content 1: Video Sharing (left side) ── */}
       <div
         ref={content1Ref}
-        className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10"
+        className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10 "
       >
         <div className="flex items-center gap-3 mb-4">
           <div
@@ -103,28 +217,14 @@ export default function PhoneShowcase() {
           </span>
         </h2>
 
-        <p className="text-white/50 text-base mb-8 leading-relaxed">
+        <p className="text-white/50 text-base mb-8 leading-relaxed ">
           Share your screen, sync your stream. Watch movies, series, and videos
           with friends — no matter where they are.
         </p>
 
         <div className="space-y-4">
           {videoFeatures.map((f) => (
-            <div key={f.title} className="flex items-start gap-4">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
-                style={{
-                  background: "rgba(136,41,224,0.15)",
-                  border: "1px solid rgba(136,41,224,0.25)",
-                }}
-              >
-                {f.icon}
-              </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">{f.title}</h4>
-                <p className="text-white/40 text-sm">{f.desc}</p>
-              </div>
-            </div>
+            <FeatureCard key={f.title} f={f} />
           ))}
         </div>
       </div>
@@ -219,21 +319,7 @@ export default function PhoneShowcase() {
 
         <div className="space-y-4">
           {audioFeatures.map((f) => (
-            <div key={f.title} className="flex items-start gap-4">
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
-                style={{
-                  background: "rgba(136,41,224,0.15)",
-                  border: "1px solid rgba(136,41,224,0.25)",
-                }}
-              >
-                {f.icon}
-              </div>
-              <div>
-                <h4 className="text-white font-semibold text-sm">{f.title}</h4>
-                <p className="text-white/40 text-sm">{f.desc}</p>
-              </div>
-            </div>
+            <FeatureCard key={f.title} f={f} />
           ))}
         </div>
       </div>

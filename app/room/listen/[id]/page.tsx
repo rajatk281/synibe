@@ -91,7 +91,7 @@ export default function ListenRoomPage() {
   };
 
   return (
-    <div className="h-screen bg-[#060612] flex overflow-hidden">
+    <div className="h-screen bg-[#060612] flex flex-col md:flex-row overflow-hidden">
       {/* Audio element (for future real audio) */}
       <audio ref={audioRef} src="/Videos/Listening.mp4" loop />
 
@@ -222,7 +222,7 @@ export default function ListenRoomPage() {
       {/* ═══════════════════════════════════════════════ */}
       {/*  RIGHT — Chat Panel                            */}
       {/* ═══════════════════════════════════════════════ */}
-      <div className="w-[300px] lg:w-[340px] flex flex-col bg-[#0a0a14] border-l border-white/[0.06]">
+      <div className="w-full md:w-[300px] lg:w-[340px] flex flex-col bg-[#0a0a14] border-t md:border-t-0 md:border-l border-white/[0.06] h-[50vh] md:h-auto">
         {/* Chat header */}
         <div className="px-5 py-4 border-b border-white/[0.06]">
           <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500">
