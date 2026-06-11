@@ -73,14 +73,14 @@ function NewRoomContent() {
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-20 sm:pt-28 pb-10 sm:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 items-start">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 sm:pt-6 sm:pb-6 ">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
 
           {/* ═══ LEFT COLUMN ═══ */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             {/* Character card */}
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden">
-              <div className="relative aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] overflow-hidden">
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden ">
+              <div className="relative aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] overflow-hidden ">
                 <Image
                   src="/wolf_avatar.png"
                   alt="Room Host Character"
@@ -89,18 +89,18 @@ function NewRoomContent() {
                   priority
                 />
                 {/* Bottom gradient overlay */}
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0c] to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#0a0a0c] to-transparent" />
               </div>
 
               <div className="px-6 pb-6 -mt-2">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse mt-6" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mt-6">
                     Status: Initializing
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 italic font-light leading-relaxed">
-                  &quot;The stage is being set, Auteur. Just a few final coordinates.&quot;
+                  &quot;The stage is being set. Just a few final coordinates.&quot;
                 </p>
               </div>
             </div>
@@ -280,7 +280,7 @@ function NewRoomContent() {
                 </p>
               )}
               <p className="mt-2 text-[10px] text-slate-600 font-medium tracking-wide">
-                Supports direct video links (.mp4, .webm) and public URLs
+                Supports Youtube Video URLs only...
               </p>
             </div>
 
