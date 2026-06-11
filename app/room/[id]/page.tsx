@@ -19,6 +19,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VideoCall from "@/app/Components/vc";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
@@ -102,6 +103,11 @@ export default function RoomPage() {
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [roomName, setRoomName] = useState<string>("");
   const [roomLoading, setRoomLoading] = useState(true);
+
+  const [showVcPrompt, setShowVcPrompt] = useState(true);
+  const [inVideoCall, setInVideoCall] = useState(false);
+  const [liveKitToken, setLiveKitToken] = useState<string | null>(null);
+  const [joiningVc, setJoiningVc] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -623,6 +629,29 @@ export default function RoomPage() {
     setExitBtn(false)
   }
 
+  const handleJoinVideoCall = async () => {
+    try {
+      setJoiningVc(true);
+      const res = await fetch("/api/livekit-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomName: roomId, participantName: userName }),
+      });
+      const data = await res.json();
+      setLiveKitToken(data.token);
+      setInVideoCall(true);
+      setShowVcPrompt(false);
+    } catch (err) {
+      console.error("Failed to get token:", err);
+    } finally {
+      setJoiningVc(false);
+    }
+  };
+
+  const handleDeclineVideoCall = () => {
+    setShowVcPrompt(false);
+  };
+
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   /* ── Render ── */
@@ -975,10 +1004,49 @@ export default function RoomPage() {
 )}
 
 
+      {showVcPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          <div className="relative w-[90%] max-w-md rounded-2xl bg-[#0a0a14] border border-white/10 p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-purple-500/20 border border-purple-500/30">
+              <span className="text-3xl">📹</span>
+            </div>
+            <h2 className="mt-4 text-center text-xl font-bold text-white">
+              Join Video Call?
+            </h2>
+            <p className="mt-2 text-center text-sm text-white/60">
+              Would you like to join the video call while watching?
+            </p>
+            <div className="mt-6 flex justify-center gap-3">
+              <button
+                onClick={handleDeclineVideoCall}
+                className="rounded-xl border border-white/10 px-5 py-2 font-medium text-white/70 transition-all duration-200 hover:bg-white/5 hover:text-white hover:cursor-pointer"
+              >
+                No, Thanks
+              </button>
+              <button
+                onClick={handleJoinVideoCall}
+                disabled={joiningVc}
+                className="rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 font-medium text-white transition-all duration-200 hover:from-purple-400 hover:to-pink-400 hover:scale-105 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
+              >
+                {joiningVc ? "Joining..." : "Yes, Join"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══════════════════════════════════════════════ */}
       {/*  RIGHT — Chat Panel                            */}
       {/* ═══════════════════════════════════════════════ */}
       <div className={`${showMobileChat ? 'flex' : 'hidden'} lg:flex w-full lg:w-[340px] xl:w-[380px] flex-col bg-[#0a0a14] border-t lg:border-t-0 lg:border-l border-white/[0.06] h-[50vh] lg:h-auto`}>
+        {inVideoCall && liveKitToken && (
+          <div className="h-[40vh] border-b border-white/[0.06] bg-black/50 relative overflow-hidden shrink-0 flex">
+            <VideoCall token={liveKitToken} roomName={roomId} />
+          </div>
+        )}
         {/* Chat header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
