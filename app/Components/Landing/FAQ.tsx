@@ -307,7 +307,7 @@ export default function FAQ() {
         <p className="text-center text-xs text-white/30 mt-10 tracking-wide">
           Still have questions?{" "}
           <a
-            href="#"
+            href="/contact"
             className="underline underline-offset-4 text-white/50 hover:text-white/80 transition-colors"
           >
             Get in touch

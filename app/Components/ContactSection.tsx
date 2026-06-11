@@ -1,4 +1,6 @@
 "use client";
+import React from 'react';
+import emailjs from '@emailjs/browser';
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -184,7 +186,31 @@ export default function ContactSection() {
     return () => ctx.revert();
   }, []);
 
+  const form = useRef(null);
+
+    const sendEmail = (e:any) => {
+    e.preventDefault();
+    if(!process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || !process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || !process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY){
+      console.log('Error: EmailJS environment variables are not set.');
+      return;
+    }
+
+    emailjs
+      .sendForm(process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!, process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!, form.current!, {
+        publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY,
+      })
+      .then(
+        () => {
+          alert('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error.text);
+        },
+      );
+  };
+
   return (
+ 
     <div className="relative w-full bg-black overflow-hidden">
       {/* ═══════════════ HERO + FORM ═══════════════ */}
       <section className="relative w-full min-h-screen overflow-hidden">
@@ -358,24 +384,26 @@ export default function ContactSection() {
                 }}
               />
 
-              <form className="relative z-10 space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <form ref={form} onSubmit={sendEmail} className="relative z-10 space-y-6">
                 {/* Name + Email row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
-                      Nom de Plume
+                      Name
                     </label>
                     <input
                       type="text"
-                      placeholder="Your Name"
+                      placeholder="Your name"
+                      name='user_name'
                       className="w-full bg-transparent text-white text-sm placeholder:text-white/20 pb-3 border-b border-white/10 focus:border-purple-500/50 outline-none transition-colors duration-300"
                     />
                   </div>
                   <div>
                     <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
-                      Digital Address
+                      Email
                     </label>
                     <input
+                    name='user_email'
                       type="email"
                       placeholder="email@domain.com"
                       className="w-full bg-transparent text-white text-sm placeholder:text-white/20 pb-3 border-b border-white/10 focus:border-purple-500/50 outline-none transition-colors duration-300"
@@ -406,9 +434,10 @@ export default function ContactSection() {
                 {/* Message */}
                 <div>
                   <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
-                    The Manifesto
+                    Message
                   </label>
                   <textarea
+                  name='message'
                     rows={4}
                     placeholder="What's on your mind?"
                     className="w-full bg-transparent text-white text-sm placeholder:text-white/20 pb-3 border-b border-white/10 focus:border-purple-500/50 outline-none transition-colors duration-300 resize-none"
@@ -416,19 +445,13 @@ export default function ContactSection() {
                 </div>
 
                 {/* Submit */}
-                <div className="flex justify-end pt-2">
-                  <button
+      
+                  <input
                     type="submit"
+                    value="Send"
                     className="group flex items-center gap-3 px-8 py-3.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-300 hover:scale-105"
-                    style={{
-                      background: "linear-gradient(135deg, var(--accent), var(--accent-soft))",
-                      boxShadow: "0 0 30px rgba(var(--glow), 0.2)",
-                    }}
                   >
-                    <span className="tracking-widest uppercase text-xs">Send Signal</span>
-                    <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
-                </div>
+                  </input>
               </form>
             </div>
           </div>

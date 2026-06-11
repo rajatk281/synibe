@@ -15,6 +15,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run socket\" \"npm run db:studio\""
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@livekit/components-react": "^2.9.21",
     "@livekit/components-styles": "^1.2.0",
     "@neondatabase/serverless": "^1.1.0",
