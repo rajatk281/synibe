@@ -8,18 +8,19 @@ import "@livekit/components-styles";
 
 export default function VideoCall({
   token,
-  roomName,
+  serverUrl,
 }: {
   token: string;
-  roomName: string;
+  serverUrl: string;
 }) {
   return (
     <LiveKitRoom
       token={token}
-      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
-      connect
-      video
-      audio
+      serverUrl={serverUrl}
+      connect={true}
+      video={true}
+      audio={true}
+      onDisconnected={() => console.log("LiveKit disconnected")}
     >
       <VideoConference />
     </LiveKitRoom>

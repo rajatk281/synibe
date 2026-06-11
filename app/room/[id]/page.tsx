@@ -23,6 +23,7 @@ import VideoCall from "@/app/Components/vc";
 
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
+const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "";
 const HEARTBEAT_INTERVAL = 3000; // 3 seconds
 
 /* ── Types ── */
@@ -108,6 +109,10 @@ export default function RoomPage() {
   const [inVideoCall, setInVideoCall] = useState(false);
   const [liveKitToken, setLiveKitToken] = useState<string | null>(null);
   const [joiningVc, setJoiningVc] = useState(false);
+  const [rightPanelWidth, setRightPanelWidth] = useState(360);
+  const [showRightPanel, setShowRightPanel] = useState(true);
+  const [showFullscreenVC, setShowFullscreenVC] = useState(true);
+  const [vcPos, setVcPos] = useState({ x: 16, y: 80 });
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -119,6 +124,11 @@ export default function RoomPage() {
   const fullscreenChatEndRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
   const ytTimeUpdateRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isResizingPanel = useRef(false);
+  const resizeStartX = useRef(0);
+  const resizeStartWidth = useRef(360);
+  const isDraggingVC = useRef(false);
+  const vcDragOffset = useRef({ x: 0, y: 0 });
 
   /* ── Derived: is this a YouTube URL? ── */
   const youtubeId = getYouTubeVideoId(videoUrl);
@@ -532,6 +542,33 @@ export default function RoomPage() {
     };
   }, [isPlaying, connected, roomId]);
 
+  /* ── Panel resize & VC drag (global mouse events) ── */
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingPanel.current) {
+        const delta = resizeStartX.current - e.clientX;
+        const newWidth = Math.max(240, Math.min(600, resizeStartWidth.current + delta));
+        setRightPanelWidth(newWidth);
+      }
+      if (isDraggingVC.current) {
+        setVcPos({
+          x: Math.max(0, e.clientX - vcDragOffset.current.x),
+          y: Math.max(0, e.clientY - vcDragOffset.current.y),
+        });
+      }
+    };
+    const handleMouseUp = () => {
+      isResizingPanel.current = false;
+      isDraggingVC.current = false;
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
   /* ── Handlers ── */
   const sendMessage = useCallback(() => {
     if (!newMsg.trim() || !socketRef.current) return;
@@ -650,6 +687,19 @@ export default function RoomPage() {
 
   const handleDeclineVideoCall = () => {
     setShowVcPrompt(false);
+  };
+
+  const handlePanelResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizingPanel.current = true;
+    resizeStartX.current = e.clientX;
+    resizeStartWidth.current = rightPanelWidth;
+  };
+
+  const handleVCDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isDraggingVC.current = true;
+    vcDragOffset.current = { x: e.clientX - vcPos.x, y: e.clientY - vcPos.y };
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -936,6 +986,19 @@ export default function RoomPage() {
                     <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 )}
+                {isFullscreen && inVideoCall && liveKitToken && (
+                  <button
+                    id="toggle-fullscreen-vc-btn"
+                    onClick={() => setShowFullscreenVC(v => !v)}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer ${showFullscreenVC
+                        ? "bg-purple-500/25 border-purple-500/40 text-purple-300 hover:bg-purple-500/40"
+                        : "bg-white/[0.08] border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.15]"
+                      }`}
+                    title={showFullscreenVC ? "Hide Video Call" : "Show Video Call"}
+                  >
+                    <span className="text-sm">📹</span>
+                  </button>
+                )}
                 <button
                   id="fullscreen-btn"
                   onClick={toggleFullscreen}
@@ -950,6 +1013,34 @@ export default function RoomPage() {
               </div>
             </div>
           </div>
+
+          {/* ── Draggable floating VC overlay — visible in fullscreen ── */}
+          {isFullscreen && inVideoCall && liveKitToken && showFullscreenVC && (
+            <div
+              className="absolute z-40 rounded-2xl overflow-hidden shadow-2xl shadow-black/70 border border-white/[0.12] select-none"
+              style={{ left: vcPos.x, top: vcPos.y, width: 280, height: 215 }}
+            >
+              {/* Drag handle bar */}
+              <div
+                className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/90 via-black/60 to-transparent flex items-center justify-between px-3 z-50 cursor-grab active:cursor-grabbing"
+                onMouseDown={handleVCDragStart}
+              >
+                <span className="text-[9px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-1.5 pointer-events-none">
+                  <span>📹</span> Video Call
+                </span>
+                <button
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => setShowFullscreenVC(false)}
+                  className="w-5 h-5 rounded-full bg-white/10 hover:bg-red-500/70 flex items-center justify-center text-white/50 hover:text-white transition-all duration-200 cursor-pointer text-[10px] leading-none"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="w-full h-full pt-8">
+                <VideoCall token={liveKitToken} serverUrl={LIVEKIT_URL} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1041,10 +1132,36 @@ export default function RoomPage() {
       {/* ═══════════════════════════════════════════════ */}
       {/*  RIGHT — Chat Panel                            */}
       {/* ═══════════════════════════════════════════════ */}
-      <div className={`${showMobileChat ? 'flex' : 'hidden'} lg:flex w-full lg:w-[340px] xl:w-[380px] flex-col bg-[#0a0a14] border-t lg:border-t-0 lg:border-l border-white/[0.06] h-[50vh] lg:h-auto`}>
-        {inVideoCall && liveKitToken && (
+      {/* Show-panel button when collapsed */}
+      {!showRightPanel && (
+        <button
+          onClick={() => setShowRightPanel(true)}
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 w-5 h-16 bg-[#0a0a14] border border-white/[0.08] border-r-0 rounded-l-xl flex items-center justify-center text-white/40 hover:text-purple-400 hover:bg-purple-500/[0.08] transition-all duration-300 cursor-pointer shadow-xl"
+          title="Show Chat Panel"
+        >
+          <span className="text-base font-bold leading-none">‹</span>
+        </button>
+      )}
+      <div
+        className={`${showMobileChat ? 'flex' : 'hidden'} lg:flex flex-col bg-[#0a0a14] border-t lg:border-t-0 lg:border-l border-white/[0.06] h-[50vh] lg:h-auto relative`}
+        style={{
+          width: showRightPanel ? `${rightPanelWidth}px` : '0px',
+          minWidth: showRightPanel ? '240px' : '0px',
+          overflow: 'hidden',
+          flexShrink: 0,
+          transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1), min-width 0.3s cubic-bezier(0.4,0,0.2,1)',
+        }}
+      >
+        {/* Resize drag handle on left edge */}
+        <div
+          className="absolute left-0 top-0 h-full w-3 z-50 cursor-col-resize group flex items-center"
+          onMouseDown={handlePanelResizeStart}
+        >
+          <div className="w-0.5 h-10 bg-white/10 group-hover:bg-purple-500/60 group-active:bg-purple-500/90 rounded-full transition-colors duration-200 ml-1" />
+        </div>
+        {inVideoCall && liveKitToken && !isFullscreen && (
           <div className="h-[40vh] border-b border-white/[0.06] bg-black/50 relative overflow-hidden shrink-0 flex">
-            <VideoCall token={liveKitToken} roomName={roomId} />
+            <VideoCall token={liveKitToken} serverUrl={LIVEKIT_URL} />
           </div>
         )}
         {/* Chat header */}
@@ -1076,6 +1193,14 @@ export default function RoomPage() {
               className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer"
             >
               <Settings className="w-3.5 h-3.5" />
+            </button>
+            <button
+              id="collapse-panel-btn"
+              onClick={() => setShowRightPanel(false)}
+              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20 transition-all duration-300 cursor-pointer"
+              title="Collapse Panel"
+            >
+              <span className="text-base font-bold leading-none">›</span>
             </button>
           </div>
         </div>
