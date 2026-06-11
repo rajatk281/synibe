@@ -19,7 +19,7 @@ export function Session() {
     <>
       {session ? (
         <div className='flex gap-4 p-4'>
-          <Link href="/create-room">
+          <Link href="/create-room/new">
             <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105 transition-all duration-500 cursor-pointer p-4 py-5">
               Start Watching
             </Button >

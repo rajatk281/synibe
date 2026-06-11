@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LogOut, Search, User, Settings, Menu, X } from "lucide-react";
+import { LogOut,  User, Settings, Menu, X } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
@@ -82,10 +82,6 @@ const Navbar = () => {
 
         {/* Right: Actions */}
         <ul className="flex gap-2 sm:gap-4 justify-center items-center px-2 sm:px-4">
-          {/* Search — hidden on very small screens */}
-          <li className="p-2 hidden sm:block">
-            <Search className="w-5 h-5" />
-          </li>
 
           {session ? (
             <li className="relative" ref={menuRef}>
@@ -211,12 +207,6 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-
-              {/* Search on mobile */}
-              <div className="flex items-center gap-3 py-3.5 text-white/60 sm:hidden">
-                <Search className="w-4 h-4" />
-                <span className="text-base font-medium">Search</span>
-              </div>
             </nav>
           </div>
         </div>
