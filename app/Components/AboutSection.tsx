@@ -13,6 +13,7 @@ import {
   Sparkles,
   Music,
 } from "lucide-react";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -929,7 +930,7 @@ export default function AboutSection() {
               </p>
 
               <div className="flex flex-wrap gap-4 justify-center">
-                <button
+                <Link href="create-room/new"><button
                   className="px-8 py-3.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-300 hover:scale-105"
                   style={{
                     background: "linear-gradient(135deg, var(--accent), var(--accent-soft))",
@@ -937,8 +938,8 @@ export default function AboutSection() {
                   }}
                 >
                   Start Watching
-                </button>
-                <button
+                </button></Link>
+                <Link href="/"><button
                   className="px-8 py-3.5 rounded-xl text-sm font-semibold text-white/60 cursor-pointer transition-all duration-300 hover:text-white hover:scale-105"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -947,6 +948,7 @@ export default function AboutSection() {
                 >
                   Explore Features
                 </button>
+                </Link>
               </div>
             </div>
           </div>
