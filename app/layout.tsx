@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", poppins.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col select-none">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Provider>{children}</Provider></body>
     </html>

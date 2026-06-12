@@ -107,7 +107,7 @@ export default function PhoneShowcase() {
   /* ── Mobile Layout (static, no GSAP pinning) ── */
   if (isMobile) {
     return (
-      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 ">
+      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 select-none">
         {/* Video Section */}
         <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 ">
           <div className="flex items-center gap-3 mb-4 ">

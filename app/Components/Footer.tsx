@@ -21,7 +21,7 @@ const footerLinks = {
 
 const Footer = () => {
   return (
-    <footer className="relative bg-black border-t border-white/[0.06] overflow-hidden">
+    <footer className="relative bg-black border-t border-white/[0.06] overflow-hidden select-none">
       {/* Ambient glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-600/[0.03] rounded-full blur-[200px] pointer-events-none" />
 

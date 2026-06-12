@@ -227,7 +227,7 @@ export default function FAQ() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-28 sm:py-36 overflow-hidden bg-black"
+      className="relative w-full py-28 sm:py-36 overflow-hidden bg-black select-none"
     >
       {/* Ambient glow */}
       <div

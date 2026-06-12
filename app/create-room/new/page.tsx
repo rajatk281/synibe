@@ -67,6 +67,15 @@ function NewRoomContent() {
     }, 1500);
   };
 
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Ambient glows */}
@@ -156,7 +165,7 @@ function NewRoomContent() {
                   <span className="text-purple-400">02.</span> Access Hash
                 </label>
                 <div className="flex items-center gap-3">
-                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wider">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wider select-text ">
                     {accessHash}
                   </span>
                   <button

@@ -142,7 +142,7 @@ const HowItWorks = () => {
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="relative w-full overflow-hidden bg-black"
+      className="relative w-full overflow-hidden bg-black select-none"
       style={{ minHeight: "100vh" }}
     >
       {/* ── Background ambient glows ── */}

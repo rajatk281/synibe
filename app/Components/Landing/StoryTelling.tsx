@@ -46,7 +46,7 @@ export default function StoryTelling() {
 
   return (
     // CONTAINER — full viewport, black background, hide overflow
-    <section
+    <section className="select-none"
       ref={sectionRef}
       style={{
         position: "relative",
