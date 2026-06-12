@@ -17,6 +17,9 @@ import {
   Volume2,
   VolumeX,
   MessageSquare,
+  Video,
+  Phone,
+  PhoneOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoCall from "@/app/Components/vc";
@@ -109,6 +112,7 @@ export default function RoomPage() {
   const [inVideoCall, setInVideoCall] = useState(false);
   const [liveKitToken, setLiveKitToken] = useState<string | null>(null);
   const [joiningVc, setJoiningVc] = useState(false);
+  const [vcAudioOnly, setVcAudioOnly] = useState(false);
   const [rightPanelWidth, setRightPanelWidth] = useState(360);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [showFullscreenVC, setShowFullscreenVC] = useState(true);
@@ -471,6 +475,29 @@ export default function RoomPage() {
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
+  }, []);
+
+  /* ── Browser back-button & tab-close warning ── */
+  useEffect(() => {
+    // Warn on tab close / refresh
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+
+    // Intercept browser back button
+    window.history.pushState(null, "", window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, "", window.location.href);
+      setExitBtn(true);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
 
@@ -997,7 +1024,7 @@ export default function RoomPage() {
                     title={showFullscreenVC ? "Hide Video Call" : "Show Video Call"}
                   >
                     <span className="text-sm">📹</span>
-                  </button>
+                  </button> 
                 )}
                 <button
                   id="fullscreen-btn"
@@ -1037,7 +1064,16 @@ export default function RoomPage() {
                 </button>
               </div>
               <div className="w-full h-full pt-8">
-                <VideoCall token={liveKitToken} serverUrl={LIVEKIT_URL} />
+                <VideoCall
+                  token={liveKitToken}
+                  serverUrl={LIVEKIT_URL}
+                  variant="floating"
+                  audioOnly={vcAudioOnly}
+                  onLeave={() => {
+                    setInVideoCall(false);
+                    setLiveKitToken(null);
+                  }}
+                />
               </div>
             </div>
           )}
@@ -1160,8 +1196,17 @@ export default function RoomPage() {
           <div className="w-0.5 h-10 bg-white/10 group-hover:bg-purple-500/60 group-active:bg-purple-500/90 rounded-full transition-colors duration-200 ml-1" />
         </div>
         {inVideoCall && liveKitToken && !isFullscreen && (
-          <div className="h-[40vh] border-b border-white/[0.06] bg-black/50 relative overflow-hidden shrink-0 flex">
-            <VideoCall token={liveKitToken} serverUrl={LIVEKIT_URL} />
+          <div className="border-b border-white/[0.06] bg-[#08081a] relative overflow-hidden shrink-0">
+            <VideoCall
+              token={liveKitToken}
+              serverUrl={LIVEKIT_URL}
+              variant="sidebar"
+              audioOnly={vcAudioOnly}
+              onLeave={() => {
+                setInVideoCall(false);
+                setLiveKitToken(null);
+              }}
+            />
           </div>
         )}
         {/* Chat header */}
@@ -1182,17 +1227,49 @@ export default function RoomPage() {
             />
           </div>
           <div className="flex items-center gap-1.5">
+            {/* Video Call toggle */}
             <button
-              id="chat-layout-btn"
-              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer"
+              id="video-call-btn"
+              onClick={() => {
+                if (inVideoCall) {
+                  setInVideoCall(false);
+                  setLiveKitToken(null);
+                } else {
+                  setVcAudioOnly(false);
+                  handleJoinVideoCall();
+                }
+              }}
+              disabled={joiningVc}
+              className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                inVideoCall
+                  ? "bg-purple-500/20 border-purple-500/30 text-purple-400 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
+                  : "bg-white/[0.04] border-white/[0.06] text-white/30 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20"
+              }`}
+              title={inVideoCall ? "Leave Video Call" : "Join Video Call"}
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
+              <Video className="w-3.5 h-3.5" />
             </button>
+            {/* Audio Call toggle */}
             <button
-              id="chat-settings-btn"
-              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer"
+              id="audio-call-btn"
+              onClick={() => {
+                if (inVideoCall) {
+                  setInVideoCall(false);
+                  setLiveKitToken(null);
+                } else {
+                  setVcAudioOnly(true);
+                  handleJoinVideoCall();
+                }
+              }}
+              disabled={joiningVc}
+              className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                inVideoCall
+                  ? "bg-purple-500/20 border-purple-500/30 text-purple-400 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
+                  : "bg-white/[0.04] border-white/[0.06] text-white/30 hover:text-green-400 hover:bg-green-500/[0.06] hover:border-green-500/20"
+              }`}
+              title={inVideoCall ? "Leave Audio Call" : "Join Audio Call"}
             >
-              <Settings className="w-3.5 h-3.5" />
+              {inVideoCall ? <PhoneOff className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
             </button>
             <button
               id="collapse-panel-btn"
