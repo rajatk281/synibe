@@ -1,5 +1,5 @@
 
-
+import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next";
 import { Poppins, Geist } from "next/font/google";
 import "./globals.css";
@@ -33,6 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col select-none">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Provider>{children}</Provider></body>
+        <Analytics />
     </html>
   );
 }
