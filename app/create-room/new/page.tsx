@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight, RefreshCw, Loader2, Link2 } from "lucide-react";
+import { ArrowRight, RefreshCw, Loader2, Link2, Copy } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { createRoom } from "./actions";
 
@@ -174,7 +174,8 @@ function NewRoomContent() {
                     value={accessHash}
                     className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20 transition-all duration-300 cursor-pointer"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
+                    {/* <RefreshCw className="w-3.5 h-3.5" /> */}
+                    <Copy onClick={(e) => handleCopy(accessHash)} className="p-1 "/>
                   </button>
                 </div>
               </div>
