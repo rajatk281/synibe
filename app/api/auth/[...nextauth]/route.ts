@@ -1,1 +1,2 @@
-export { POST, GET } from "@/auth"
+export const dynamic = "force-dynamic";
+export { POST, GET } from "@/auth";

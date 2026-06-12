@@ -7,7 +7,6 @@ const sql = neon(process.env.DATABASE_URL!);
 
 async function setup() {
   console.log("Creating rooms table...");
-
   await sql`
     CREATE TABLE IF NOT EXISTS "rooms" (
       "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -20,15 +19,32 @@ async function setup() {
       CONSTRAINT "rooms_id_unique" UNIQUE("id")
     )
   `;
+  console.log("✅ rooms table ready");
 
-  console.log("✅ rooms table created (or already exists)");
+  console.log("Creating users table...");
+  await sql`
+    CREATE TABLE IF NOT EXISTS "users" (
+      "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      "name" text NOT NULL,
+      "email" text NOT NULL UNIQUE,
+      "image" text,
+      "role" text NOT NULL DEFAULT 'user',
+      "welcome_email_sent" boolean NOT NULL DEFAULT false,
+      "created_at" timestamp NOT NULL DEFAULT now()
+    )
+  `;
+  console.log("✅ users table ready");
 
-  // Verify
-  const result = await sql`SELECT COUNT(*) FROM "rooms"`;
-  console.log("✅ Table verified. Row count:", result[0].count);
+  const tables = await sql`
+    SELECT table_name FROM information_schema.tables
+    WHERE table_schema = 'public'
+    ORDER BY table_name
+  `;
+  console.log("📋 All tables:", tables.map((r: any) => r.table_name as string));
 }
 
 setup().catch((err) => {
   console.error("❌ Error:", err);
   process.exit(1);
 });
+
