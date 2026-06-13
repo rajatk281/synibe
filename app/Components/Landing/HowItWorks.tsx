@@ -46,15 +46,14 @@ const HowItWorks = () => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [activeStep, setActiveStep] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [loadedSteps, setLoadedSteps] = useState<number[]>([0]);
 
-  // Preload all videos
+  // Keep track of which steps have been hovered/activated to load their video
   useEffect(() => {
-    videoRefs.current.forEach((video) => {
-      if (video) {
-        video.load();
-      }
-    });
-  }, []);
+    if (!loadedSteps.includes(activeStep)) {
+      setLoadedSteps((prev) => [...prev, activeStep]);
+    }
+  }, [activeStep, loadedSteps]);
 
   // Handle video switching
   useEffect(() => {
@@ -62,14 +61,17 @@ const HowItWorks = () => {
       if (!video) return;
       if (i === activeStep) {
         video.style.opacity = "1";
-        video.play().catch(() => {});
+        // Play only if video has a valid src
+        if (video.src) {
+          video.play().catch(() => {});
+        }
       } else {
         video.style.opacity = "0";
         video.pause();
         video.currentTime = 0;
       }
     });
-  }, [activeStep]);
+  }, [activeStep, loadedSteps]);
 
   // GSAP entrance animations
   useEffect(() => {
@@ -374,24 +376,27 @@ const HowItWorks = () => {
               <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-white/20 z-20" />
 
               {/* Video layers */}
-              {steps.map((step, i) => (
-                <video
-                  key={step.number}
-                  ref={(el) => {
-                    videoRefs.current[i] = el;
-                  }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{
-                    opacity: i === 0 ? 1 : 0,
-                    transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                  src={step.video}
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                />
-              ))}
+              {steps.map((step, i) => {
+                const isLoaded = loadedSteps.includes(i);
+                return (
+                  <video
+                    key={step.number}
+                    ref={(el) => {
+                      videoRefs.current[i] = el;
+                    }}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{
+                      opacity: i === activeStep ? 1 : 0,
+                      transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                    src={isLoaded ? step.video : undefined}
+                    muted
+                    loop
+                    playsInline
+                    preload={isLoaded ? "auto" : "none"}
+                  />
+                );
+              })}
 
               {/* Placeholder state when no interaction yet */}
               {!hasInteracted && (
