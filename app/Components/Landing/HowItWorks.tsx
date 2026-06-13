@@ -12,28 +12,28 @@ const steps = [
     title: "Create a Room",
     description:
       "Start a new watch room in one click and get a shareable invite link instantly.",
-    video: "/videos/steps/synibeStep-1.mp4",
+    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-1_qcsjjq.mp4",
   },
   {
     number: "02",
     title: "Invite Your Friends",
     description:
       "Share the link — anyone with it can join your room instantly. No sign-up required.",
-    video: "/videos/steps/synibeStep-2.mp4",
+    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-2_mwou1c.mp4",
   },
   {
     number: "03",
     title: "Pick Something to Watch",
     description:
       "Paste a video URL or choose from the library. Everyone sees the same thing.",
-    video: "/videos/steps/synibeStep-3.mp4",
+    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-4_xmib8b.mp4",
   },
   {
     number: "04",
     title: "Vibe Together",
     description:
       "Play, pause, react — everything is synced in real-time. Just enjoy the moment.",
-    video: "/videos/steps/synibeStep-4.mp4",
+    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-3_jus1dm.mp4",
   },
 ];
 
