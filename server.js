@@ -1,14 +1,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createClient } from "redis";
-import { createAdapter } from "@socket.io/redis-adapter";
 
-// ── Configuration ──
 const PORT = process.env.PORT || 3001;
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
-const MAX_MESSAGES = 100;
-
-// ── HTTP + Socket.IO ──
 const httpServer = createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Socket server is running");
@@ -21,153 +14,56 @@ const io = new Server(httpServer, {
   },
 });
 
-// ── Redis clients ──
-let sanitizedRedisUrl = REDIS_URL;
-if (sanitizedRedisUrl.startsWith("https://")) {
-  sanitizedRedisUrl = sanitizedRedisUrl.replace(/^https:\/\//, "rediss://");
-} else if (sanitizedRedisUrl.startsWith("http://")) {
-  sanitizedRedisUrl = sanitizedRedisUrl.replace(/^http:\/\//, "redis://");
-}
+// Track users per room: roomId -> Map<socketId, userName>
+const roomUsers = new Map();
 
-if (sanitizedRedisUrl.includes("upstash.io") && !sanitizedRedisUrl.includes("@")) {
-  console.warn(
-    "\n⚠️  [Redis] Warning: Your REDIS_URL points to Upstash but does not contain credentials (no '@' character found). Upstash requires authentication. Please use the Redis URL format: rediss://default:YOUR_PASSWORD@host:port\n"
-  );
-}
+// Message history per room: roomId -> ChatMessage[] (capped at 100)
+const roomMessages = new Map();
 
-let pubClient, subClient, redisClient;
-try {
-  pubClient = createClient({ url: sanitizedRedisUrl });
-  subClient = pubClient.duplicate();
-  redisClient = pubClient.duplicate();
+// Video state per room: roomId -> { currentTime, isPlaying, lastUpdated, updatedBy }
+const roomVideoState = new Map();
 
-  // Register error listeners to prevent unhandled 'error' events from crashing the process
-  pubClient.on("error", (err) => console.error("[Redis] pubClient error:", err));
-  subClient.on("error", (err) => console.error("[Redis] subClient error:", err));
-  redisClient.on("error", (err) => console.error("[Redis] redisClient error:", err));
-} catch (err) {
-  console.error("❌ Redis client creation failed:", err);
-  // Create mock clients so the server doesn't crash on start or on events
-  const createMockClient = () => ({
-    connect: async () => {},
-    duplicate: () => createMockClient(),
-    on: () => {},
-    hSet: async () => 0,
-    hDel: async () => 0,
-    hGetAll: async () => ({}),
-    rPush: async () => 0,
-    lTrim: async () => "OK",
-    lRange: async () => [],
-    del: async () => 0,
-  });
-  pubClient = createMockClient();
-  subClient = pubClient.duplicate();
-  redisClient = pubClient.duplicate();
-}
+const MAX_MESSAGES = 100;
 
-async function connectRedis() {
-  try {
-    await Promise.all([
-      pubClient.connect(),
-      subClient.connect(),
-      redisClient.connect(),
-    ]);
-    io.adapter(createAdapter(pubClient, subClient));
-    console.log("✅ Redis connected & Socket.IO adapter attached");
-  } catch (err) {
-    console.error("❌ Redis connection failed:", err);
-    console.log("⚠️  Falling back to in-memory adapter (no horizontal scaling)");
+function pushMessage(roomId, message) {
+  if (!roomMessages.has(roomId)) {
+    roomMessages.set(roomId, []);
+  }
+  const history = roomMessages.get(roomId);
+  history.push(message);
+  // Cap at MAX_MESSAGES
+  if (history.length > MAX_MESSAGES) {
+    history.splice(0, history.length - MAX_MESSAGES);
   }
 }
-
-// ── Redis key helpers ──
-const keys = {
-  users: (roomId) => `room:${roomId}:users`,
-  messages: (roomId) => `room:${roomId}:messages`,
-  video: (roomId) => `room:${roomId}:video`,
-};
-
-// ── Room state operations (Redis-backed) ──
-
-async function addUser(roomId, socketId, userName) {
-  await redisClient.hSet(keys.users(roomId), socketId, userName);
-}
-
-async function removeUser(roomId, socketId) {
-  await redisClient.hDel(keys.users(roomId), socketId);
-}
-
-async function getUserCount(roomId) {
-  const users = await redisClient.hGetAll(keys.users(roomId));
-  return Object.keys(users).length;
-}
-
-async function isRoomEmpty(roomId) {
-  return (await getUserCount(roomId)) === 0;
-}
-
-async function pushMessage(roomId, message) {
-  await redisClient.rPush(keys.messages(roomId), JSON.stringify(message));
-  // Cap at MAX_MESSAGES
-  await redisClient.lTrim(keys.messages(roomId), -MAX_MESSAGES, -1);
-}
-
-async function getMessageHistory(roomId) {
-  const raw = await redisClient.lRange(keys.messages(roomId), 0, -1);
-  return raw.map((item) => JSON.parse(item));
-}
-
-async function setVideoState(roomId, state) {
-  await redisClient.hSet(keys.video(roomId), {
-    currentTime: String(state.currentTime),
-    isPlaying: String(state.isPlaying),
-    lastUpdated: String(state.lastUpdated),
-    updatedBy: state.updatedBy,
-  });
-}
-
-async function getVideoState(roomId) {
-  const data = await redisClient.hGetAll(keys.video(roomId));
-  if (!data || !data.currentTime) return null;
-  return {
-    currentTime: parseFloat(data.currentTime),
-    isPlaying: data.isPlaying === "true",
-    lastUpdated: parseInt(data.lastUpdated, 10),
-    updatedBy: data.updatedBy,
-  };
-}
-
-async function cleanupRoom(roomId) {
-  await redisClient.del(keys.users(roomId));
-  await redisClient.del(keys.messages(roomId));
-  await redisClient.del(keys.video(roomId));
-}
-
-// ── Socket.IO event handlers ──
 
 io.on("connection", (socket) => {
   let currentRoom = null;
   let currentUser = null;
 
   // User joins a room
-  socket.on("join-room", async ({ roomId, userName }) => {
+  socket.on("join-room", ({ roomId, userName }) => {
     currentRoom = roomId;
     currentUser = userName || "Anonymous";
 
     socket.join(roomId);
 
-    // Track this user in Redis
-    await addUser(roomId, socket.id, currentUser);
+    // Track this user in the room
+    if (!roomUsers.has(roomId)) {
+      roomUsers.set(roomId, new Map());
+    }
+    roomUsers.get(roomId).set(socket.id, currentUser);
 
-    const onlineCount = await getUserCount(roomId);
+    const onlineCount = roomUsers.get(roomId).size;
 
-    // Send message history to the joining socket
-    const history = await getMessageHistory(roomId);
+    // ── Send message history to the joining socket ──
+    const history = roomMessages.get(roomId) || [];
     socket.emit("message-history", history);
 
-    // Send current video state to the joining socket
-    const videoState = await getVideoState(roomId);
+    // ── Send current video state to the joining socket ──
+    const videoState = roomVideoState.get(roomId);
     if (videoState) {
+      // Estimate current position based on elapsed time since last update
       const elapsed = (Date.now() - videoState.lastUpdated) / 1000;
       const estimatedTime = videoState.isPlaying
         ? videoState.currentTime + elapsed
@@ -179,14 +75,14 @@ io.on("connection", (socket) => {
       });
     }
 
-    // Create and store the system message
+    // ── Create and store the system message ──
     const joinMsg = {
       id: Date.now(),
       type: "system",
       text: `${currentUser} joined the room`,
       timestamp: new Date().toISOString(),
     };
-    await pushMessage(roomId, joinMsg);
+    pushMessage(roomId, joinMsg);
 
     // Notify everyone in the room (including sender)
     io.to(roomId).emit("user-joined", {
@@ -202,7 +98,7 @@ io.on("connection", (socket) => {
   });
 
   // User sends a message
-  socket.on("send-message", async ({ roomId, text, userName }) => {
+  socket.on("send-message", ({ roomId, text, userName }) => {
     const message = {
       id: Date.now(),
       type: "chat",
@@ -211,8 +107,8 @@ io.on("connection", (socket) => {
       text,
       timestamp: new Date().toISOString(),
     };
-    // Store in Redis
-    await pushMessage(roomId, message);
+    // Store in history
+    pushMessage(roomId, message);
     // Broadcast to everyone in the room
     io.to(roomId).emit("new-message", message);
   });
@@ -222,9 +118,9 @@ io.on("connection", (socket) => {
   // ═══════════════════════════════════════════════
 
   // A user performed a video action (play, pause, seek)
-  socket.on("video-action", async ({ roomId, action, currentTime, userName }) => {
-    // Update the authoritative room state in Redis
-    await setVideoState(roomId, {
+  socket.on("video-action", ({ roomId, action, currentTime, userName }) => {
+    // Update the authoritative room state
+    roomVideoState.set(roomId, {
       currentTime,
       isPlaying: action === "play" || action === "seek-while-playing",
       lastUpdated: Date.now(),
@@ -244,9 +140,9 @@ io.on("connection", (socket) => {
     );
   });
 
-  // Periodic heartbeat to keep room state fresh
-  socket.on("video-heartbeat", async ({ roomId, currentTime, isPlaying }) => {
-    await setVideoState(roomId, {
+  // Periodic heartbeat to keep room state fresh (sent by the "oldest" connected client)
+  socket.on("video-heartbeat", ({ roomId, currentTime, isPlaying }) => {
+    roomVideoState.set(roomId, {
       currentTime,
       isPlaying,
       lastUpdated: Date.now(),
@@ -255,44 +151,46 @@ io.on("connection", (socket) => {
   });
 
   // User disconnects
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", () => {
     if (!currentRoom || !currentUser) return;
 
-    await removeUser(currentRoom, socket.id);
-    const onlineCount = await getUserCount(currentRoom);
+    const users = roomUsers.get(currentRoom);
+    if (users) {
+      users.delete(socket.id);
+      const onlineCount = users.size;
 
-    // Create and store the system message
-    const leaveMsg = {
-      id: Date.now() + 1,
-      type: "system",
-      text: `${currentUser} left the room`,
-      timestamp: new Date().toISOString(),
-    };
-    await pushMessage(currentRoom, leaveMsg);
+      // Create and store the system message
+      const leaveMsg = {
+        id: Date.now() + 1,
+        type: "system",
+        text: `${currentUser} left the room`,
+        timestamp: new Date().toISOString(),
+      };
+      pushMessage(currentRoom, leaveMsg);
 
-    // Notify remaining users
-    io.to(currentRoom).emit("user-left", {
-      userName: currentUser,
-      socketId: socket.id,
-      message: leaveMsg,
-    });
-    io.to(currentRoom).emit("online-count", onlineCount);
+      // Notify remaining users
+      io.to(currentRoom).emit("user-left", {
+        userName: currentUser,
+        socketId: socket.id,
+        message: leaveMsg,
+      });
+      io.to(currentRoom).emit("online-count", onlineCount);
 
-    // Clean up room data if empty
-    if (await isRoomEmpty(currentRoom)) {
-      await cleanupRoom(currentRoom);
-      console.log(`[${currentRoom}] Room empty. Cleaned up Redis state.`);
+      // Clean up room data if empty
+      if (users.size === 0) {
+        roomUsers.delete(currentRoom);
+        roomMessages.delete(currentRoom);
+        roomVideoState.delete(currentRoom);
+        console.log(`[${currentRoom}] Room empty. Cleaned up state.`);
+      }
+
+      console.log(
+        `[${currentRoom}] ${currentUser} left. Online: ${onlineCount}`
+      );
     }
-
-    console.log(
-      `[${currentRoom}] ${currentUser} left. Online: ${onlineCount}`
-    );
   });
 });
 
-// ── Start server ──
-await connectRedis();
-
-httpServer.listen(PORT, "0.0.0.0", () => {
+httpServer.listen(PORT,  "0.0.0.0", () => {
   console.log(`\n🔌 Socket.io server running on http://localhost:${PORT}\n`);
 });

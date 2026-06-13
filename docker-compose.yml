@@ -1,10 +1,4 @@
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: synibe-redis
-    ports:
-      - "6379:6379"
-    restart: always
   web:
     build:
       context: .
@@ -41,9 +35,6 @@ services:
       - NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=${NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}
       - NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=${NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}
       - AUTH_URL=${AUTH_URL:-http://localhost:3000}
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - redis
     restart: always
 
   socket:
@@ -66,7 +57,4 @@ services:
       - .env
     environment:
       - PORT=3001
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - redis
     restart: always
