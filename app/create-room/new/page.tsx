@@ -94,6 +94,7 @@ function NewRoomContent() {
                   src="/wolf_avatar.png"
                   alt="Room Host Character"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                   priority
                 />
@@ -164,9 +165,9 @@ function NewRoomContent() {
                 <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                   <span className="text-purple-400">02.</span> Access Hash
                 </label>
-                <div className="flex items-center gap-3">
-                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wider select-text ">
-                    {accessHash}
+                <div className="flex items-center gap-3 h-10">
+                  <span className={`text-xl sm:text-2xl md:text-3xl font-black tracking-wider select-text transition-colors duration-300 ${accessHash ? "text-white" : "text-white/20 animate-pulse"}`}>
+                    {accessHash || "SNB-000-A"}
                   </span>
                   <button
                     id="refresh-hash-btn"
@@ -323,15 +324,41 @@ function NewRoomContent() {
   );
 }
 
+function NewRoomSkeleton() {
+  return (
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Ambient glows */}
+      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-12 sm:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
+          {/* LEFT COLUMN */}
+          <div className="flex flex-col gap-4">
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden h-[360px] animate-pulse" />
+            <div className="h-24 bg-white/[0.01] rounded-xl w-3/4 animate-pulse" />
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="flex flex-col gap-5 pt-2">
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-5">
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
+            </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[120px] animate-pulse" />
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[120px] animate-pulse" />
+            <div className="h-14 bg-white/[0.02] rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NewRoomPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen bg-black flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin" />
-        </div>
-      }
-    >
+    <Suspense fallback={<NewRoomSkeleton />}>
       <NewRoomContent />
     </Suspense>
   );
