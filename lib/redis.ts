@@ -14,6 +14,12 @@ function getRedisClient(): RedisClient {
     url = url.replace(/^http:\/\//, "redis://");
   }
 
+  if (url.includes("upstash.io") && !url.includes("@")) {
+    console.warn(
+      "\n⚠️  [Redis] Warning: Your REDIS_URL points to Upstash but does not contain credentials (no '@' character found). Upstash requires authentication. Please use the Redis URL format: rediss://default:YOUR_PASSWORD@host:port\n"
+    );
+  }
+
   try {
     return createClient({ url });
   } catch (err) {

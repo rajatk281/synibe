@@ -29,6 +29,12 @@ if (sanitizedRedisUrl.startsWith("https://")) {
   sanitizedRedisUrl = sanitizedRedisUrl.replace(/^http:\/\//, "redis://");
 }
 
+if (sanitizedRedisUrl.includes("upstash.io") && !sanitizedRedisUrl.includes("@")) {
+  console.warn(
+    "\n⚠️  [Redis] Warning: Your REDIS_URL points to Upstash but does not contain credentials (no '@' character found). Upstash requires authentication. Please use the Redis URL format: rediss://default:YOUR_PASSWORD@host:port\n"
+  );
+}
+
 let pubClient, subClient, redisClient;
 try {
   pubClient = createClient({ url: sanitizedRedisUrl });
