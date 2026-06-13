@@ -26,14 +26,14 @@ const steps = [
     title: "Pick Something to Watch",
     description:
       "Paste a video URL or choose from the library. Everyone sees the same thing.",
-    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-4_xmib8b.mp4",
-  },
-  {
-    number: "04",
-    title: "Vibe Together",
-    description:
+      video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-3_jus1dm.mp4",
+    },
+    {
+      number: "04",
+      title: "Vibe Together",
+      description:
       "Play, pause, react — everything is synced in real-time. Just enjoy the moment.",
-    video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-3_jus1dm.mp4",
+      video: "https://res.cloudinary.com/dwect2foi/video/upload/Steps/synibeStep-4_xmib8b.mp4",
   },
 ];
 
