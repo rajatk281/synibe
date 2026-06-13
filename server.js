@@ -22,10 +22,37 @@ const io = new Server(httpServer, {
 });
 
 // ── Redis clients ──
-const pubClient = createClient({ url: REDIS_URL });
-const subClient = pubClient.duplicate();
-// General-purpose client for storing room state
-const redisClient = pubClient.duplicate();
+let sanitizedRedisUrl = REDIS_URL;
+if (sanitizedRedisUrl.startsWith("https://")) {
+  sanitizedRedisUrl = sanitizedRedisUrl.replace(/^https:\/\//, "rediss://");
+} else if (sanitizedRedisUrl.startsWith("http://")) {
+  sanitizedRedisUrl = sanitizedRedisUrl.replace(/^http:\/\//, "redis://");
+}
+
+let pubClient, subClient, redisClient;
+try {
+  pubClient = createClient({ url: sanitizedRedisUrl });
+  subClient = pubClient.duplicate();
+  redisClient = pubClient.duplicate();
+} catch (err) {
+  console.error("❌ Redis client creation failed:", err);
+  // Create mock clients so the server doesn't crash on start or on events
+  const createMockClient = () => ({
+    connect: async () => {},
+    duplicate: () => createMockClient(),
+    on: () => {},
+    hSet: async () => 0,
+    hDel: async () => 0,
+    hGetAll: async () => ({}),
+    rPush: async () => 0,
+    lTrim: async () => "OK",
+    lRange: async () => [],
+    del: async () => 0,
+  });
+  pubClient = createMockClient();
+  subClient = pubClient.duplicate();
+  redisClient = pubClient.duplicate();
+}
 
 async function connectRedis() {
   try {
