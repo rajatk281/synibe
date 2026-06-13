@@ -1,12 +1,16 @@
-// "use client"
-import Spline from '@splinetool/react-spline/next';
+"use client"
 import { MessageCircle, Shield, TvMinimalPlay } from 'lucide-react';
 import { Session } from '../session-provider';
+import dynamic from 'next/dynamic';
+const Spline = dynamic(
+  () => import("@splinetool/react-spline"),
+  { ssr: false }
+);
 const Hero = () => {
   
   return (
     <div className='h-screen select-none relative overflow-hidden'>
-      <Spline
+      <Spline 
         scene="https://prod.spline.design/SPTzpTCWXqcDDGF0/scene.splinecode"
       />
 

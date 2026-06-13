@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Provider } from "./Components/session-provider";
 import Script from "next/script";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -30,12 +30,19 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", poppins.variable, "font-sans", geist.variable)}
     >
+      <head>
+        <link
+          rel="preconnect"
+          href="https://prod.spline.design"
+          crossOrigin=""
+        />
+      </head>
       <body className="min-h-full flex flex-col select-none">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         <Provider>{children}</Provider>
         <SpeedInsights />
         <Analytics />
-        </body>
+      </body>
     </html>
   );
 }
