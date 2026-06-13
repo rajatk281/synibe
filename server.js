@@ -40,6 +40,11 @@ try {
   pubClient = createClient({ url: sanitizedRedisUrl });
   subClient = pubClient.duplicate();
   redisClient = pubClient.duplicate();
+
+  // Register error listeners to prevent unhandled 'error' events from crashing the process
+  pubClient.on("error", (err) => console.error("[Redis] pubClient error:", err));
+  subClient.on("error", (err) => console.error("[Redis] subClient error:", err));
+  redisClient.on("error", (err) => console.error("[Redis] redisClient error:", err));
 } catch (err) {
   console.error("❌ Redis client creation failed:", err);
   // Create mock clients so the server doesn't crash on start or on events
