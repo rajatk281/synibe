@@ -6,13 +6,36 @@ import Hero from "./Components/Landing/Hero";
 import Navbar from "./Components/Navbar";
 import LazySection from "./Components/LazySection";
 
-// Dynamically import below-the-fold components
-const PhoneShowcase = dynamic(() => import("./Components/Landing/PhoneShowcase"), { ssr: false });
-const StoryTelling = dynamic(() => import("./Components/Landing/StoryTelling"), { ssr: false });
-const AudioAnimation = dynamic(() => import("./Components/Landing/AudioAnimation"), { ssr: false });
-const HowItWorks = dynamic(() => import("./Components/Landing/HowItWorks"), { ssr: false });
-const FAQ = dynamic(() => import("./Components/Landing/FAQ"), { ssr: false });
-const Footer = dynamic(() => import("./Components/Footer"), { ssr: false });
+// Dynamically import below-the-fold components with matching skeleton fallbacks
+const PhoneShowcase = dynamic(() => import("./Components/Landing/PhoneShowcase"), {
+  ssr: false,
+  loading: () => <div className="min-h-[1400px] lg:min-h-screen w-full" />,
+});
+
+const StoryTelling = dynamic(() => import("./Components/Landing/StoryTelling"), {
+  ssr: false,
+  loading: () => <div className="min-h-screen w-full" />,
+});
+
+const AudioAnimation = dynamic(() => import("./Components/Landing/AudioAnimation"), {
+  ssr: false,
+  loading: () => <div className="min-h-screen w-full" />,
+});
+
+const HowItWorks = dynamic(() => import("./Components/Landing/HowItWorks"), {
+  ssr: false,
+  loading: () => <div className="min-h-[1200px] lg:min-h-screen w-full" />,
+});
+
+const FAQ = dynamic(() => import("./Components/Landing/FAQ"), {
+  ssr: false,
+  loading: () => <div className="min-h-[700px] lg:min-h-[600px] w-full" />,
+});
+
+const Footer = dynamic(() => import("./Components/Footer"), {
+  ssr: false,
+  loading: () => <div className="min-h-[350px] lg:min-h-[300px] w-full" />,
+});
 
 const page = () => {
   return (
@@ -20,27 +43,27 @@ const page = () => {
       <Navbar />
       <Hero />
       
-      <LazySection minHeight="100vh">
+      <LazySection className="min-h-[1400px] lg:min-h-screen">
         <PhoneShowcase />
       </LazySection>
       
-      <LazySection minHeight="100vh">
+      <LazySection className="min-h-screen">
         <StoryTelling />
       </LazySection>
       
-      <LazySection minHeight="100vh">
+      <LazySection className="min-h-screen">
         <AudioAnimation />
       </LazySection>
       
-      <LazySection minHeight="100vh">
+      <LazySection className="min-h-[1200px] lg:min-h-screen">
         <HowItWorks />
       </LazySection>
       
-      <LazySection minHeight="600px">
+      <LazySection className="min-h-[700px] lg:min-h-[600px]">
         <FAQ />
       </LazySection>
       
-      <LazySection minHeight="300px">
+      <LazySection className="min-h-[350px] lg:min-h-[300px]">
         <Footer />
       </LazySection>
     </div>

@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 interface LazySectionProps {
   children: React.ReactNode;
-  minHeight?: string;
+  className?: string;
 }
 
-export default function LazySection({ children, minHeight = "400px" }: LazySectionProps) {
+export default function LazySection({ children, className }: LazySectionProps) {
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -43,8 +43,8 @@ export default function LazySection({ children, minHeight = "400px" }: LazySecti
   return (
     <div
       ref={ref}
+      className={className}
       style={{
-        minHeight: inView ? "auto" : minHeight,
         width: "100%",
       }}
     >
