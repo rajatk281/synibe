@@ -28,17 +28,18 @@ export default function PhoneShowcase() {
   const video2Ref = useRef<HTMLVideoElement>(null);
   const content1Ref = useRef<HTMLDivElement>(null);
   const content2Ref = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [loadVideo, setLoadVideo] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1024);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    // Only load the heavy video source if we are on a desktop width (>= 1024px)
+    if (window.innerWidth >= 1024) {
+      setLoadVideo(true);
+    }
   }, []);
 
   useEffect(() => {
-    if (isMobile) return; // Skip GSAP on mobile
+    const isDesktop = window.innerWidth >= 1024;
+    if (!isDesktop) return; // Skip GSAP on mobile
 
     const section = sectionRef.current;
     const phone = phoneRef.current;
@@ -83,7 +84,7 @@ export default function PhoneShowcase() {
     });
 
     return () => ctx.revert();
-  }, [isMobile]);
+  }, []);
 
   /* ── Feature Card Component ── */
   const FeatureCard = ({ f }: { f: { title: string; desc: string; icon: string } }) => (
@@ -104,10 +105,10 @@ export default function PhoneShowcase() {
     </div>
   );
 
-  /* ── Mobile Layout (static, no GSAP pinning) ── */
-  if (isMobile) {
-    return (
-      <section className="relative overflow-hidden bg-black pt-16 sm:py-24 select-none">
+  return (
+    <>
+      {/* ── Mobile Layout (static, no GSAP pinning) — visible only below lg breakpoint ── */}
+      <section className="lg:hidden relative overflow-hidden bg-black pt-16 sm:py-24 select-none">
         {/* Video Section */}
         <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 ">
           <div className="flex items-center gap-3 mb-4 ">
@@ -185,157 +186,155 @@ export default function PhoneShowcase() {
           }}
         />
       </section>
-    );
-  }
 
-  /* ── Desktop Layout (GSAP pinned animation) ── */
-  return (
-    <section
-      ref={sectionRef}
-      className="relative w-full h-screen overflow-hidden bg-black"
-    >
-      {/* ── Content 1: Video Sharing (left side) ── */}
-      <div
-        ref={content1Ref}
-        className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10 "
+      {/* ── Desktop Layout (GSAP pinned animation) — visible only from lg breakpoint ── */}
+      <section
+        ref={sectionRef}
+        className="hidden lg:block relative w-full h-screen overflow-hidden bg-black"
       >
-        <div className="flex items-center gap-3 mb-4">
-          <div
-            className="w-8 h-[2px]"
-            style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
-          />
-          <span className="text-sm font-medium tracking-widest uppercase text-white/50">
-            Watch Together
-          </span>
-        </div>
-
-        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-          Watch Together,
-          <br />
-          <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Stay Connected
-          </span>
-        </h2>
-
-        <p className="text-white/50 text-base mb-8 leading-relaxed ">
-          Share your screen, sync your stream. Watch movies, series, and videos
-          with friends — no matter where they are.
-        </p>
-
-        <div className="space-y-2">
-          {videoFeatures.map((f) => (
-            <FeatureCard key={f.title} f={f} />
-          ))}
-        </div>
-      </div>
-
-      {/* ── Phone Container ── */}
-      <div
-        ref={phoneRef}
-        className="absolute top-1/2 left-1/2 rounded-2xl z-10"
-        style={{
-          width: 400,
-          height: 610,
-          marginLeft: -150,
-          marginTop: -305,
-          willChange: "transform",
-          filter: "drop-shadow(0 0 40px rgba(var(--glow), 0.2))",
-        }}
-      >
-        {/* Screen area — inset values measured from phone.com.png pixel data */}
+        {/* ── Content 1: Video Sharing (left side) ── */}
         <div
-          className="absolute overflow-hidden rounded-4xl mx-8 "
+          ref={content1Ref}
+          className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10 "
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-8 h-[2px]"
+              style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
+            />
+            <span className="text-sm font-medium tracking-widest uppercase text-white/50">
+              Watch Together
+            </span>
+          </div>
+
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+            Watch Together,
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Stay Connected
+            </span>
+          </h2>
+
+          <p className="text-white/50 text-base mb-8 leading-relaxed ">
+            Share your screen, sync your stream. Watch movies, series, and videos
+            with friends — no matter where they are.
+          </p>
+
+          <div className="space-y-2">
+            {videoFeatures.map((f) => (
+              <FeatureCard key={f.title} f={f} />
+            ))}
+          </div>
+        </div>
+
+        {/* ── Phone Container ── */}
+        <div
+          ref={phoneRef}
+          className="absolute top-1/2 left-1/2 rounded-2xl z-10"
           style={{
-            top: '5.7%',
-            left: '7.1%',
-            right: '7.1%',
-            bottom: '4.3%',
+            width: 400,
+            height: 610,
+            marginLeft: -150,
+            marginTop: -305,
+            willChange: "transform",
+            filter: "drop-shadow(0 0 40px rgba(var(--glow), 0.2))",
           }}
         >
-          {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
-          <video
-            ref={video1Ref}
-            src="/Videos/musicplayer.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              transform: 'rotate(90deg) scale(2)',
-            }}
-          />
-
-          {/* Video 2: portrait video, normal orientation */}
-          <video
-            ref={video2Ref}
-            src="/Videos/musicplayer.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover "
-          />
-        </div>
-
-        {/* Phone frame overlay — sits on top of everything */}
-        <Image
-          src="/phone.com.png"
-          alt="Phone"
-          className="absolute inset-0 w-full h-full pointer-events-none z-10 "
-          width={3936}
-          height={6000}
-          draggable={false}
-        />
-      </div>
-
-      {/* ── Content 2: Audio Listening (right side) ── */}
-      <div
-        ref={content2Ref}
-        className="absolute right-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 mr-10"
-      >
-        <div className="flex items-center gap-3 mb-4">
+          {/* Screen area — inset values measured from phone.com.png pixel data */}
           <div
-            className="w-8 h-[2px]"
-            style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
+            className="absolute overflow-hidden rounded-4xl mx-8 "
+            style={{
+              top: '5.7%',
+              left: '7.1%',
+              right: '7.1%',
+              bottom: '4.3%',
+            }}
+          >
+            {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
+            <video
+              ref={video1Ref}
+              src={loadVideo ? "/Videos/musicplayer.mp4" : undefined}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                transform: 'rotate(90deg) scale(2)',
+              }}
+            />
+
+            {/* Video 2: portrait video, normal orientation */}
+            <video
+              ref={video2Ref}
+              src={loadVideo ? "/Videos/musicplayer.mp4" : undefined}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover "
+            />
+          </div>
+
+          {/* Phone frame overlay — sits on top of everything */}
+          <Image
+            src="/phone.com.png"
+            alt="Phone"
+            className="absolute inset-0 w-full h-full pointer-events-none z-10 "
+            width={3936}
+            height={6000}
+            draggable={false}
           />
-          <span className="text-sm font-medium tracking-widest uppercase text-white/50">
-            Listen Together
-          </span>
         </div>
 
-        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-          Listen Together,
-          <br />
-          <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Feel the Beat
-          </span>
-        </h2>
+        {/* ── Content 2: Audio Listening (right side) ── */}
+        <div
+          ref={content2Ref}
+          className="absolute right-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 mr-10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-8 h-[2px]"
+              style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-soft))" }}
+            />
+            <span className="text-sm font-medium tracking-widest uppercase text-white/50">
+              Listen Together
+            </span>
+          </div>
 
-        <p className="text-white/50 text-base mb-8 leading-relaxed">
-          Sync your music sessions with anyone. Drop the same beat at the same
-          moment — together, anywhere in the world.
-        </p>
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+            Listen Together,
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              Feel the Beat
+            </span>
+          </h2>
 
-        <div className="space-y-2">
-          {audioFeatures.map((f) => (
-            <FeatureCard key={f.title} f={f} />
-          ))}
+          <p className="text-white/50 text-base mb-8 leading-relaxed">
+            Sync your music sessions with anyone. Drop the same beat at the same
+            moment — together, anywhere in the world.
+          </p>
+
+          <div className="space-y-2">
+            {audioFeatures.map((f) => (
+              <FeatureCard key={f.title} f={f} />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Ambient glow */}
-      <div
-        className="absolute pointer-events-none z-0"
-        style={{
-          width: 600,
-          height: 600,
-          top: "50%",
-          left: "50%",
-          transform: "translate(-60%,-50%)",
-          background: "radial-gradient(circle, rgba(var(--glow),0.3) 0%, transparent 70%)",
-        }}
-      />
-    </section>
+        {/* Ambient glow */}
+        <div
+          className="absolute pointer-events-none z-0"
+          style={{
+            width: 600,
+            height: 600,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-60%,-50%)",
+            background: "radial-gradient(circle, rgba(var(--glow),0.3) 0%, transparent 70%)",
+          }}
+        />
+      </section>
+    </>
   );
 }

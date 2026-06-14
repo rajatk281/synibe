@@ -82,7 +82,7 @@ function NewRoomContent() {
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 sm:pt-6 sm:pb-6 ">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
 
           {/* ═══ LEFT COLUMN ═══ */}
@@ -165,18 +165,28 @@ function NewRoomContent() {
                 <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                   <span className="text-purple-400">02.</span> Access Hash
                 </label>
-                <div className="flex items-center gap-3 h-10">
-                  <span className={`text-xl sm:text-2xl md:text-3xl font-black tracking-wider select-text transition-colors duration-300 ${accessHash ? "text-white" : "text-white/20 animate-pulse"}`}>
+                <div className="flex items-center gap-3 h-10 justify-between">
+                  <span className={`text-lg sm:text-xl md:text-2xl font-black tracking-wider select-text whitespace-nowrap transition-colors duration-300 ${accessHash ? "text-white" : "text-white/20 animate-pulse"}`}>
                     {accessHash || "SNB-000-A"}
                   </span>
                   <button
+                    id="copy-hash-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopy(accessHash);
+                    }}
+                    className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20 transition-all duration-300 cursor-pointer"
+                    title="Copy Access Hash"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                  <button
                     id="refresh-hash-btn"
                     onClick={() => setAccessHash(generateAccessHash())}
-                    value={accessHash}
                     className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20 transition-all duration-300 cursor-pointer"
+                    title="Generate New Hash"
                   >
-                    {/* <RefreshCw className="w-3.5 h-3.5" /> */}
-                    <Copy onClick={(e) => handleCopy(accessHash)} className="p-1 "/>
+                    <RefreshCw className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -333,23 +343,83 @@ function NewRoomSkeleton() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
+          
           {/* LEFT COLUMN */}
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden h-[360px] animate-pulse" />
-            <div className="h-24 bg-white/[0.01] rounded-xl w-3/4 animate-pulse" />
+            {/* Character card skeleton */}
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden">
+              <div className="aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] bg-white/[0.02] animate-pulse" />
+              <div className="px-6 pb-6 -mt-2">
+                <div className="flex items-center gap-2 mb-2 mt-6 animate-pulse">
+                  <div className="w-2 h-2 rounded-full bg-purple-500/40" />
+                  <div className="h-3 bg-white/[0.08] w-24 rounded" />
+                </div>
+                <div className="h-3 bg-white/[0.04] w-3/4 rounded mt-2 animate-pulse" />
+              </div>
+            </div>
+
+            {/* NEW SCENE heading skeleton */}
+            <div className="animate-pulse">
+              <div className="h-8 sm:h-10 md:h-12 lg:h-14 bg-white/[0.04] rounded-lg w-1/2" />
+              <div className="h-8 sm:h-10 md:h-12 lg:h-14 bg-white/[0.04] rounded-lg w-2/3 mt-2" />
+              <div className="h-4 bg-white/[0.02] rounded-md w-3/4 mt-4" />
+              <div className="h-4 bg-white/[0.02] rounded-md w-1/2 mt-2" />
+            </div>
           </div>
 
           {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-5 pt-2">
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
-            <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-5">
-              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
-              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[100px] animate-pulse" />
+            {/* 01. Destination Name skeleton */}
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[126px] flex flex-col justify-between">
+              <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
+              <div className="h-[50px] bg-white/[0.02] border border-white/[0.08] rounded-xl animate-pulse" />
             </div>
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[120px] animate-pulse" />
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] h-[120px] animate-pulse" />
-            <div className="h-14 bg-white/[0.02] rounded-2xl animate-pulse" />
+
+            {/* Row: Access Hash + Visibility */}
+            <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-5">
+              {/* 02. Access Hash skeleton */}
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[116px] flex flex-col justify-between">
+                <div className="h-3 bg-white/[0.08] w-24 rounded animate-pulse" />
+                <div className="h-10 bg-white/[0.02] rounded-md w-3/4 animate-pulse" />
+              </div>
+
+              {/* 03. Visibility Protocol skeleton */}
+              <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[116px] flex flex-col justify-between">
+                <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
+                <div className="flex gap-2 mt-1">
+                  <div className="flex-1 h-10 bg-white/[0.02] border border-white/[0.08] rounded-lg animate-pulse" />
+                  <div className="flex-1 h-10 bg-white/[0.02] border border-white/[0.08] rounded-lg animate-pulse" />
+                </div>
+              </div>
+            </div>
+
+            {/* 04. Participant Limit skeleton */}
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[122px] flex flex-col justify-between">
+              <div className="flex justify-between items-center">
+                <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
+                <div className="h-6 bg-white/[0.08] w-8 rounded animate-pulse" />
+              </div>
+              <div className="h-1.5 bg-white/[0.06] rounded-full w-full animate-pulse my-2" />
+              <div className="flex justify-between">
+                <div className="h-2.5 bg-white/[0.04] w-16 rounded animate-pulse" />
+                <div className="h-2.5 bg-white/[0.04] w-24 rounded animate-pulse" />
+              </div>
+            </div>
+
+            {/* 05. Video URL skeleton */}
+            <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[148px] flex flex-col justify-between">
+              <div className="h-3 bg-white/[0.08] w-36 rounded animate-pulse" />
+              <div className="flex gap-3 my-1">
+                <div className="w-10 h-10 bg-white/[0.04] border border-white/[0.08] rounded-lg flex-shrink-0 animate-pulse" />
+                <div className="flex-1 h-10 bg-white/[0.02] border border-white/[0.08] rounded-xl animate-pulse" />
+              </div>
+              <div className="h-2.5 bg-white/[0.04] w-48 rounded animate-pulse" />
+            </div>
+
+            {/* Deploy Room button skeleton */}
+            <div className="h-[60px] bg-white/[0.02] rounded-2xl animate-pulse" />
           </div>
+
         </div>
       </div>
     </div>

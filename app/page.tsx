@@ -8,7 +8,6 @@ import LazySection from "./Components/LazySection";
 
 // Dynamically import below-the-fold components with matching skeleton fallbacks
 const PhoneShowcase = dynamic(() => import("./Components/Landing/PhoneShowcase"), {
-  ssr: false,
   loading: () => <div className="min-h-[1400px] lg:min-h-screen w-full" />,
 });
 
