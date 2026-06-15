@@ -253,7 +253,7 @@ export default function PhoneShowcase() {
             {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
             <video
               ref={video1Ref}
-              src={loadVideo ? "/Videos/musicplayer.mp4" : undefined}
+              src={loadVideo ? "https://res.cloudinary.com/dwect2foi/video/upload/v1781526080/chicchore-trailer_dxnnri.mp4" : undefined}
               autoPlay
               loop
               muted

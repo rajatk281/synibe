@@ -16,11 +16,6 @@ const StoryTelling = dynamic(() => import("./Components/Landing/StoryTelling"), 
   loading: () => <div className="min-h-screen w-full" />,
 });
 
-const AudioAnimation = dynamic(() => import("./Components/Landing/AudioAnimation"), {
-  ssr: false,
-  loading: () => <div className="min-h-screen w-full" />,
-});
-
 const HowItWorks = dynamic(() => import("./Components/Landing/HowItWorks"), {
   ssr: false,
   loading: () => <div className="min-h-[1200px] lg:min-h-screen w-full" />,
@@ -50,9 +45,9 @@ const page = () => {
         <StoryTelling />
       </LazySection>
       
-      <LazySection className="min-h-screen">
+      {/* <LazySection className="min-h-screen">
         <AudioAnimation />
-      </LazySection>
+      </LazySection> */}
       
       <LazySection className="min-h-[1200px] lg:min-h-screen">
         <HowItWorks />
@@ -69,4 +64,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default page;

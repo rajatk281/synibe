@@ -737,9 +737,9 @@ export default function RoomPage() {
       {/* ═══════════════════════════════════════════════ */}
       {/*  LEFT — Video Player Area                      */}
       {/* ═══════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col relative min-h-0">
+      <div className="flex-1  flex flex-col relative min-h-0 ">
         {/* Video container */}
-        <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black">
+        <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black ">
           {/* Conditional: YouTube embed or native <video> */}
           {isYouTube ? (
             <div className="absolute inset-0 w-full h-full">
@@ -748,12 +748,16 @@ export default function RoomPage() {
                 className="w-full h-full"
               />
               {/* Transparent overlay to block YT clickjacking and let our controls work */}
-              <div className="absolute inset-0 z-[1]" />
+              <div
+                onClick={togglePlay}
+                className="absolute inset-0 z-[1] cursor-pointer"
+              />
             </div>
           ) : (
             <video
+              onClick={togglePlay}
               ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover z-50"
+              className="absolute inset-0 w-full h-full object-cover cursor-pointer z-0"
               src={videoUrl || undefined}
               autoPlay
               loop
@@ -799,11 +803,11 @@ export default function RoomPage() {
 
           {/* ── Fullscreen Floating Chat Panel ── */}
           {isFullscreen && showFullscreenChat && (
-            <div className="absolute top-20 right-5 bottom-28 w-80 lg:w-96 bg-transparent flex flex-col overflow-hidden z-30 room-msg-appear">
+            <div className="absolute top-20 right-5  bottom-28 w-80 lg:w-96 bg-transparent flex flex-col overflow-hidden z-30 room-msg-appear">
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 bg-transparent">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                  <MessageSquare className="w-3.5 h-3.5 " />
                   <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-300 drop-shadow-md">
                     Live Chat
                   </span>
@@ -831,7 +835,7 @@ export default function RoomPage() {
                     return (
                       <div key={msg.id} className="flex items-center gap-2 justify-center">
                         <div className="h-px flex-1 bg-white/[0.05]" />
-                        <span className="text-[9px] text-purple-400/60 font-semibold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full bg-[#0a0a14]/40 backdrop-blur-sm border border-purple-500/10 whitespace-nowrap">
+                        <span className="text-[9px]  font-semibold uppercase tracking-[0.12em] px-2 py-0.5 rounded-2xl bg-[#0a0a14]/40 backdrop-blur-sm border border-slate-800/10 whitespace-nowrap">
                           {msg.text}
                         </span>
                         <div className="h-px flex-1 bg-white/[0.05]" />
@@ -845,13 +849,13 @@ export default function RoomPage() {
                     >
                       <div className={`max-w-[85%] ${msg.side === "right" ? "items-end" : "items-start"} flex flex-col`}>
                         {msg.side === "left" && (
-                          <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-0.5 ml-1 drop-shadow-md">
+                          <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-white-400/70 mb-0.5 ml-1 drop-shadow-md">
                             {msg.user}
                           </span>
                         )}
                         <div
                           className={`px-3 py-2 rounded-xl text-[12px] leading-relaxed font-medium ${msg.side === "right"
-                              ? "bg-gradient-to-br from-purple-600/70 to-pink-600/60 backdrop-blur-sm text-white rounded-tr-md border border-purple-500/20 shadow-lg shadow-purple-500/10"
+                              ? "bg-neutral-900 backdrop-blur-sm text-white rounded-tr-md border border-neutral-500/20 shadow-lg shadow-neutral-500/10"
                               : "bg-[#0a0a14]/70 backdrop-blur-sm text-white/95 rounded-tl-md border border-white/10 shadow-lg"
                             }`}
                         >
@@ -866,7 +870,7 @@ export default function RoomPage() {
 
               {/* Input */}
               <div className="px-3 py-2 bg-transparent">
-                <div className="flex items-center gap-2 bg-[#0a0a14]/70 backdrop-blur-md rounded-lg border border-white/[0.1] px-2.5 py-1.5 focus-within:border-purple-500/50 transition-all duration-300 shadow-lg">
+                <div className="flex items-center gap-2 bg-[#0a0a14]/70 backdrop-blur-md rounded-lg border border-white/[0.1] px-2.5 py-1.5 focus-within:border-neutral-500/50 transition-all duration-300 shadow-lg">
                   <input
                     type="text"
                     placeholder="Type a message..."
@@ -878,7 +882,7 @@ export default function RoomPage() {
                   <button
                     onClick={sendMessage}
                     disabled={!connected || !newMsg.trim()}
-                    className="w-6 h-6 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-6 h-6 rounded-md bg-gradient-to-r from-blue-400 to-blue-700 flex items-center justify-center text-white hover:from-blue-500 hover:to-blue-800 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <Send className="w-3 h-3" />
                   </button>
@@ -888,14 +892,14 @@ export default function RoomPage() {
           )}
 
           {/* Top overlay gradient */}
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10 pointer-events-none" />
           {/* Bottom overlay gradient */}
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060612] via-[#060612]/60 to-transparent z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060612] via-[#060612]/60 to-transparent z-10 pointer-events-none" />
 
           {/* ── Top-left: Title & viewers ── */}
-          <div className="absolute top-5 left-5 z-20">
-            <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+          <div className="absolute top-5 left-5 z-20 ">
+            <h2 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2 ">
+              <span className="text-white/70">
                 {roomName || "Untitled Room"}
               </span>
             </h2>
@@ -921,33 +925,19 @@ export default function RoomPage() {
 
           {/* ── Floating emoji reaction ── */}
           {activeReaction && (
-            <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30 text-6xl room-reaction-float pointer-events-none">
+            <div className="absolute  bottom-32 left-1/2 -translate-x-1/2 z-30 text-6xl room-reaction-float pointer-events-none">
               {activeReaction}
             </div>
           )}
 
           {/* ── Bottom controls ── */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-5 pb-3 sm:pb-4">
-            {/* Emoji reaction bar — hidden on small mobile, visible sm+ */}
-            <div className="hidden sm:flex items-center justify-center mb-3">
-              <div className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/[0.08] backdrop-blur-xl border border-white/[0.06]">
-                {EMOJI_REACTIONS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => triggerReaction(emoji)}
-                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-white/[0.1] hover:scale-125 transition-all duration-200 text-base sm:text-lg cursor-pointer"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-5 pb-3 sm:pb-4 pointer-events-none">
 
             {/* Progress bar — clickable to seek */}
             <div
               ref={progressBarRef}
               onClick={handleSeek}
-              className="relative w-full h-1 bg-white/[0.08] rounded-full overflow-hidden group cursor-pointer mb-3"
+              className="relative w-full h-1 bg-white/[0.08] rounded-full overflow-hidden group cursor-pointer mb-3 pointer-events-auto"
             >
               <div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
@@ -960,7 +950,7 @@ export default function RoomPage() {
             </div>
 
             {/* Controls row */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pointer-events-auto">
               <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   id="play-pause-btn"
@@ -1132,7 +1122,7 @@ export default function RoomPage() {
 
 
       {showVcPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center ">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
@@ -1172,7 +1162,7 @@ export default function RoomPage() {
       {!showRightPanel && (
         <button
           onClick={() => setShowRightPanel(true)}
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 w-5 h-16 bg-[#0a0a14] border border-white/[0.08] border-r-0 rounded-l-xl flex items-center justify-center text-white/40 hover:text-purple-400 hover:bg-purple-500/[0.08] transition-all duration-300 cursor-pointer shadow-xl"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 w-5 h-16 bg-[#0a0a14] border-white/[0.08] border-r-0 rounded-l-xl flex items-center justify-center text-white/40 hover:text-purple-400 hover:bg-purple-500/[0.08] transition-all duration-300 cursor-pointer shadow-xl"
           title="Show Chat Panel"
         >
           <span className="text-base font-bold leading-none">‹</span>
@@ -1190,7 +1180,7 @@ export default function RoomPage() {
       >
         {/* Resize drag handle on left edge */}
         <div
-          className="absolute left-0 top-0 h-full w-3 z-50 cursor-col-resize group flex items-center"
+          className="absolute left-0 top-0 h-full w-3 z-50 cursor-col-resize group flex items-center "
           onMouseDown={handlePanelResizeStart}
         >
           <div className="w-0.5 h-10 bg-white/10 group-hover:bg-purple-500/60 group-active:bg-purple-500/90 rounded-full transition-colors duration-200 ml-1" />
@@ -1212,11 +1202,11 @@ export default function RoomPage() {
         {/* Chat header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-purple-400" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+            <Users className="w-4 h-4 " />
+            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white">
               Live Chat
             </span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold  uppercase tracking-wider">
               {onlineCount} Online
             </span>
             {/* Connection indicator */}
@@ -1242,7 +1232,7 @@ export default function RoomPage() {
               disabled={joiningVc}
               className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                 inVideoCall
-                  ? "bg-purple-500/20 border-purple-500/30 text-purple-400 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
+                  ? "bg-neutral-500/20 border-slate-500/30 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
                   : "bg-white/[0.04] border-white/[0.06] text-white/30 hover:text-purple-400 hover:bg-purple-500/[0.06] hover:border-purple-500/20"
               }`}
               title={inVideoCall ? "Leave Video Call" : "Join Video Call"}
@@ -1264,7 +1254,7 @@ export default function RoomPage() {
               disabled={joiningVc}
               className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                 inVideoCall
-                  ? "bg-purple-500/20 border-purple-500/30 text-purple-400 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
+                  ? "bg-neutral-500/20 border-slate-500/30  hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400"
                   : "bg-white/[0.04] border-white/[0.06] text-white/30 hover:text-green-400 hover:bg-green-500/[0.06] hover:border-green-500/20"
               }`}
               title={inVideoCall ? "Leave Audio Call" : "Join Audio Call"}
@@ -1283,10 +1273,10 @@ export default function RoomPage() {
         </div>
 
         {/* Chat messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin ">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30">
-              <Users className="w-8 h-8 text-purple-400" />
+              <Users className="w-8 h-8 " />
               <p className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">
                 No messages yet
               </p>
@@ -1302,7 +1292,7 @@ export default function RoomPage() {
                   className="flex items-center gap-2 justify-center room-msg-appear"
                 >
                   <div className="h-px flex-1 bg-white/[0.05]" />
-                  <span className="text-[10px] text-purple-400/60 font-semibold uppercase tracking-[0.12em] px-2 py-1 rounded-full bg-purple-500/[0.07] border border-purple-500/10 whitespace-nowrap">
+                  <span className="text-[10px] text-white-400/60 font-semibold uppercase tracking-[0.12em] px-2 py-1 rounded-full bg-neutral-500/[0.07] border border-purple-500/10 whitespace-nowrap">
                     {msg.text}
                   </span>
                   <div className="h-px flex-1 bg-white/[0.05]" />
@@ -1323,13 +1313,13 @@ export default function RoomPage() {
                     } flex flex-col`}
                 >
                   {msg.side === "left" && (
-                    <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-purple-400/70 mb-1 ml-1">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-white-400/70 mb-1 ml-1">
                       {msg.user}
                     </span>
                   )}
                   <div
                     className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed font-medium ${msg.side === "right"
-                        ? "bg-gradient-to-br from-purple-600/30 to-pink-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
+                        ? "bg-gradient-to-br from-neutral-600/30 to-slate-600/20 text-white/90 rounded-tr-md border border-purple-500/10"
                         : "bg-white/[0.05] text-white/80 rounded-tl-md border border-white/[0.06]"
                       }`}
                   >
@@ -1347,11 +1337,11 @@ export default function RoomPage() {
 
         {/* Chat input */}
         <div className="px-4 py-3 border-t border-white/[0.06]">
-          <div className="flex items-center gap-2 bg-white/[0.04] rounded-xl border border-white/[0.06] px-3 py-2 focus-within:border-purple-500/30 transition-all duration-300">
+          <div className="flex items-center gap-2 bg-white/[0.04] rounded-xl border border-white/[0.06] px-3 py-2 focus-within:border-slate-500/30 transition-all duration-300">
             <button
               id="emoji-picker-btn"
               onClick={() => setShowEmojis(!showEmojis)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-purple-400 hover:bg-purple-500/[0.06] transition-all duration-300 cursor-pointer"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-neutral-200 hover:bg-neutral-500/[0.06] transition-all duration-300 cursor-pointer"
             >
               <Smile className="w-4 h-4" />
             </button>
@@ -1368,7 +1358,7 @@ export default function RoomPage() {
               id="send-msg-btn"
               onClick={sendMessage}
               disabled={!connected || !newMsg.trim()}
-              className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-400 hover:to-pink-400 hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/20 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
+              className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-400 to-blue-700 flex items-center justify-center text-white hover:from-blue-500 hover:to-blue-800 hover:scale-110 transition-all duration-300 shadow-lg  cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
             >
               <Send className="w-3.5 h-3.5" />
             </button>

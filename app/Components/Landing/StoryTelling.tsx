@@ -66,7 +66,7 @@ export default function StoryTelling() {
           height: "100%",
           objectFit: "cover",
         }}
-        src="/Videos/musicplayer.mp4"
+        src="https://res.cloudinary.com/dwect2foi/video/upload/v1781525186/spiderman-vid_t5dwqu.mp4"
         autoPlay
         loop
         muted
