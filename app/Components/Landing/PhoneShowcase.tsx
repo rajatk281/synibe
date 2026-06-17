@@ -264,7 +264,7 @@ export default function PhoneShowcase() {
               }}
             />
 
-            Video 2: portrait video, normal orientation
+            {/* Video 2: portrait video, normal orientation */}
             <video
               ref={video2Ref}
               src={loadVideo ? "/Videos/musicplayer.mp4" : undefined}
