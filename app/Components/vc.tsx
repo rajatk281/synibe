@@ -24,7 +24,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-/* ── Inner component that renders inside LiveKitRoom context ── */
+
 function VideoCallInner({
   onLeave,
   compact = false,
@@ -45,7 +45,7 @@ function VideoCallInner({
 
   return (
     <div className="vc-container flex flex-col h-full">
-      {/* ── Header ── */}
+      
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
@@ -79,7 +79,7 @@ function VideoCallInner({
         </div>
       </div>
 
-      {/* ── Video Grid ── */}
+      
       <div
         className="relative overflow-hidden transition-all duration-300 ease-in-out"
         style={{
@@ -110,7 +110,7 @@ function VideoCallInner({
         )}
       </div>
 
-      {/* ── Controls Bar ── */}
+      
       <div
         className="transition-all duration-300 ease-in-out overflow-hidden"
         style={{
@@ -137,7 +137,7 @@ function VideoCallInner({
   );
 }
 
-/* ── Floating compact VC for fullscreen mode ── */
+
 function VideoCallFloating({
   onLeave,
 }: {
@@ -155,7 +155,7 @@ function VideoCallFloating({
 
   return (
     <div className="vc-container flex flex-col h-full w-full">
-      {/* Video grid - takes full space */}
+      
       <div className="flex-1 relative overflow-hidden">
         {tracks.length > 0 ? (
           <GridLayout
@@ -175,7 +175,7 @@ function VideoCallFloating({
         )}
       </div>
 
-      {/* Mini control bar */}
+      
       <ControlBar
         variation="minimal"
         controls={{
@@ -193,7 +193,7 @@ function VideoCallFloating({
   );
 }
 
-/* ── Main export ── */
+
 export default function VideoCall({
   token,
   serverUrl,

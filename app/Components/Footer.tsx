@@ -22,13 +22,13 @@ const footerLinks = {
 const Footer = () => {
   return (
     <footer className="relative bg-black border-t border-white/[0.06] overflow-hidden select-none">
-      {/* Ambient glow */}
+      
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-600/[0.03] rounded-full blur-[200px] pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
-        {/* Main footer content */}
+        
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 md:gap-8 py-16">
-          {/* Brand column */}
+          
           <div className="flex flex-col gap-5">
             <Link href="/" className="group">
               <h2 className="text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors duration-300">
@@ -40,7 +40,7 @@ const Footer = () => {
               listening, and reacting — no matter the distance.
             </p>
 
-            {/* Social icons */}
+            
             <div className="flex items-center gap-2 mt-2">
               {["X", "GH", "DC", "IG"].map((label) => (
                 <a
@@ -54,7 +54,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Product links */}
+          
           <div>
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-5">
               Product
@@ -73,7 +73,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Company links */}
+          
           <div>
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-5">
               Company
@@ -92,7 +92,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal links */}
+          
           <div>
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-5">
               Legal
@@ -112,10 +112,10 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
+        
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-        {/* Bottom bar */}
+        
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-6">
           <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-700">
             © {new Date().getFullYear()} Synibe. Directed by Design. All Rights

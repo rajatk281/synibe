@@ -12,7 +12,7 @@ export default function LazySection({ children, className }: LazySectionProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // If IntersectionObserver is not supported, render immediately
+    
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
       setInView(true);
       return;
@@ -26,7 +26,7 @@ export default function LazySection({ children, className }: LazySectionProps) {
         }
       },
       {
-        rootMargin: "200px 0px", // Trigger slightly before it enters the viewport
+        rootMargin: "200px 0px", 
       }
     );
 

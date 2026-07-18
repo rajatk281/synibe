@@ -34,7 +34,7 @@ const faqs = [
   },
 ];
 
-/* ─── Accordion Item ─── */
+
 function AccordionItem({
   faq,
   index,
@@ -97,7 +97,7 @@ function AccordionItem({
         transition: "background 0.3s ease, border-color 0.3s ease",
       }}
     >
-      {/* Question button */}
+      
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between px-7 py-5 cursor-pointer"
@@ -115,7 +115,7 @@ function AccordionItem({
           {faq.question}
         </span>
 
-        {/* Animated chevron */}
+        
         <div
           className="shrink-0 ml-4 w-8 h-8 rounded-full flex items-center justify-center"
           style={{
@@ -149,7 +149,7 @@ function AccordionItem({
         </div>
       </button>
 
-      {/* Answer panel */}
+      
       <div
         ref={contentRef}
         style={{ height: 0, overflow: "hidden" }}
@@ -175,7 +175,7 @@ function AccordionItem({
   );
 }
 
-/* ─── FAQ Section ─── */
+
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -187,7 +187,7 @@ export default function FAQ() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Heading entrance
+      
       gsap.fromTo(
         headingRef.current,
         { y: 40, opacity: 0 },
@@ -203,7 +203,7 @@ export default function FAQ() {
         }
       );
 
-      // Stagger FAQ items
+      
       gsap.fromTo(
         itemsRef.current.filter(Boolean),
         { y: 30, opacity: 0 },
@@ -229,7 +229,7 @@ export default function FAQ() {
       ref={sectionRef}
       className="relative w-full py-28 sm:py-36 overflow-hidden bg-black select-none"
     >
-      {/* Ambient glow */}
+      
       <div
         className="absolute pointer-events-none"
         style={{
@@ -244,9 +244,9 @@ export default function FAQ() {
       />
 
       <div className="relative z-10 max-w-2xl mx-auto px-6">
-        {/* Section heading */}
+        
         <div ref={headingRef} className="text-center mb-14" style={{ opacity: 0 }}>
-          {/* Label */}
+          
           <div className="flex items-center justify-center gap-3 mb-5">
             <div
               className="w-8 h-[2px]"
@@ -283,7 +283,7 @@ export default function FAQ() {
           </h2>
         </div>
 
-        {/* FAQ list */}
+        
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div
@@ -303,7 +303,7 @@ export default function FAQ() {
           ))}
         </div>
 
-        {/* Bottom helper text */}
+        
         <p className="text-center text-xs text-white/30 mt-10 tracking-wide">
           Still have questions?{" "}
           <a

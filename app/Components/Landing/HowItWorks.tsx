@@ -48,20 +48,20 @@ const HowItWorks = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [loadedSteps, setLoadedSteps] = useState<number[]>([0]);
 
-  // Keep track of which steps have been hovered/activated to load their video
+  
   useEffect(() => {
     if (!loadedSteps.includes(activeStep)) {
       setLoadedSteps((prev) => [...prev, activeStep]);
     }
   }, [activeStep, loadedSteps]);
 
-  // Handle video switching
+  
   useEffect(() => {
     videoRefs.current.forEach((video, i) => {
       if (!video) return;
       if (i === activeStep) {
         video.style.opacity = "1";
-        // Play only if video has a valid src
+        
         if (video.src) {
           video.play().catch(() => {});
         }
@@ -73,10 +73,10 @@ const HowItWorks = () => {
     });
   }, [activeStep, loadedSteps]);
 
-  // GSAP entrance animations
+  
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header entrance
+      
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
@@ -95,7 +95,7 @@ const HowItWorks = () => {
         );
       }
 
-      // Steps entrance
+      
       gsap.fromTo(
         stepItemsRef.current.filter(Boolean),
         { x: -30, opacity: 0 },
@@ -112,7 +112,7 @@ const HowItWorks = () => {
         }
       );
 
-      // Video container entrance (desktop)
+      
       if (videoContainerRef.current) {
         gsap.fromTo(
           videoContainerRef.current,
@@ -147,7 +147,7 @@ const HowItWorks = () => {
       className="relative w-full overflow-hidden bg-black select-none"
       style={{ minHeight: "100vh" }}
     >
-      {/* ── Background ambient glows ── */}
+      
       <div
         className="absolute pointer-events-none"
         style={{
@@ -171,7 +171,7 @@ const HowItWorks = () => {
         }}
       />
 
-      {/* Grid pattern overlay */}
+      
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -184,9 +184,9 @@ const HowItWorks = () => {
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
-        {/* ── Section Header ── */}
+        
         <div ref={headerRef} className="mb-16 sm:mb-20 lg:mb-24">
-          {/* Label */}
+          
           <div className="flex items-center gap-3 mb-6" style={{ opacity: 0 }}>
             <div
               className="w-8 h-[2px]"
@@ -207,7 +207,7 @@ const HowItWorks = () => {
             />
           </div>
 
-          {/* Title */}
+          
           <h2
             className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.1] mb-4"
             style={{ opacity: 0 }}
@@ -227,7 +227,7 @@ const HowItWorks = () => {
             </span>
           </h2>
 
-          {/* Subtitle */}
+          
           <p
             className="text-sm sm:text-base text-white/40 max-w-lg leading-relaxed"
             style={{ opacity: 0 }}
@@ -237,9 +237,9 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        {/* ── Main Content: Steps + Video ── */}
+        
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start lg:items-center">
-          {/* LEFT: Steps List */}
+          
           <div
             ref={stepsContainerRef}
             className="w-full lg:w-[45%] xl:w-[42%]"
@@ -267,7 +267,7 @@ const HowItWorks = () => {
                     onClick={() => handleStepHover(i)}
                   >
                     <div className="flex gap-4 sm:gap-5 items-start p-4 sm:p-5">
-                      {/* Step number badge */}
+                      
                       <div
                         className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-500"
                         style={{
@@ -283,7 +283,7 @@ const HowItWorks = () => {
                         {step.number}
                       </div>
 
-                      {/* Text content */}
+                      
                       <div className="flex-1 min-w-0">
                         <h3
                           className="text-base sm:text-lg font-semibold mb-1 transition-colors duration-300"
@@ -296,7 +296,7 @@ const HowItWorks = () => {
                           {step.title}
                         </h3>
 
-                        {/* Description — expands on active */}
+                        
                         <div
                           className="overflow-hidden transition-all duration-500"
                           style={{
@@ -310,7 +310,7 @@ const HowItWorks = () => {
                         </div>
                       </div>
 
-                      {/* Active indicator arrow */}
+                      
                       <div
                         className="hidden lg:flex shrink-0 items-center justify-center w-8 h-8 rounded-lg transition-all duration-300"
                         style={{
@@ -340,7 +340,7 @@ const HowItWorks = () => {
                       </div>
                     </div>
 
-                    {/* Progress bar at bottom */}
+                    
                     <div
                       className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full transition-all duration-500"
                       style={{
@@ -356,7 +356,7 @@ const HowItWorks = () => {
             </div>
           </div>
 
-          {/* RIGHT: Video Preview Area */}
+          
           <div
             ref={videoContainerRef}
             className="w-full lg:w-[55%] xl:w-[58%] relative"
@@ -369,13 +369,13 @@ const HowItWorks = () => {
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
             >
-              {/* Corner accents */}
+              
               <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-white/20 z-20" />
               <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-white/20 z-20" />
               <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-white/20 z-20" />
               <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-white/20 z-20" />
 
-              {/* Video layers */}
+              
               {steps.map((step, i) => {
                 const isLoaded = loadedSteps.includes(i);
                 return (
@@ -398,7 +398,7 @@ const HowItWorks = () => {
                 );
               })}
 
-              {/* Placeholder state when no interaction yet */}
+              
               {!hasInteracted && (
                 <div
                   className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none lg:hidden"
@@ -429,7 +429,7 @@ const HowItWorks = () => {
                 </div>
               )}
 
-              {/* Step indicator overlay */}
+              
               <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
                 <div
                   className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/70"
@@ -444,7 +444,7 @@ const HowItWorks = () => {
                 </div>
               </div>
 
-              {/* Dot indicators */}
+              
               <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5">
                 {steps.map((_, i) => (
                   <div
@@ -462,7 +462,7 @@ const HowItWorks = () => {
                 ))}
               </div>
 
-              {/* Subtle glow effect behind video */}
+              
               <div
                 className="absolute inset-0 pointer-events-none z-[1]"
                 style={{
@@ -472,7 +472,7 @@ const HowItWorks = () => {
               />
             </div>
 
-            {/* Reflection / ambient glow below video */}
+            
             <div
               className="absolute -bottom-8 left-[10%] right-[10%] h-16 pointer-events-none"
               style={{

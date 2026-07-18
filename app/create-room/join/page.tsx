@@ -13,7 +13,7 @@ function JoinRoomContent() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [isJoining, setIsJoining] = useState(false);
 
-  // Focus first input on mount
+  
   useEffect(() => {
     inputRefs.current[0]?.focus();
   }, []);
@@ -25,7 +25,7 @@ function JoinRoomContent() {
     newCode[index] = upper;
     setCode(newCode);
 
-    // Auto-advance to next input
+    
     if (upper && index < 6) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -59,7 +59,7 @@ function JoinRoomContent() {
   const handleJoin = () => {
     if (!isComplete) return;
     setIsJoining(true);
-    // Simulate join handshake, then navigate to the correct room type
+    
     setTimeout(() => {
       const roomId = fullCode.toLowerCase();
       if (mode === "listen") {
@@ -72,11 +72,11 @@ function JoinRoomContent() {
 
   return (
     <div className="h-screen bg-black relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Ambient glow effects */}
+      
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-orange-600/[0.04] rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 w-[400px] h-[300px] bg-amber-700/[0.03] rounded-full blur-[180px] pointer-events-none" />
 
-      {/* Subtle noise texture overlay */}
+      
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.015]"
         style={{
@@ -84,9 +84,9 @@ function JoinRoomContent() {
         }}
       />
 
-      {/* Content */}
+      
       <div className="relative z-10 flex flex-col items-center w-full max-w-lg px-6">
-        {/* Mascot */}
+        
         <div className="relative w-28 h-28 mb-4 join-mascot-float">
           <Image
             src="/join_mascot.png"
@@ -95,16 +95,16 @@ function JoinRoomContent() {
             className="object-contain drop-shadow-2xl"
             priority
           />
-          {/* Glow behind mascot */}
+          
           <div className="absolute inset-0 bg-orange-500/10 rounded-full blur-2xl -z-10 scale-150" />
         </div>
 
-        {/* Label */}
+        
         <span className="text-[10px] font-bold uppercase tracking-[0.25em] bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-3">
           Ready to Begin?
         </span>
 
-        {/* Heading */}
+        
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center leading-tight tracking-tight mb-6 sm:mb-10">
           Enter your
           <br />
@@ -113,12 +113,12 @@ function JoinRoomContent() {
           </span>
         </h1>
 
-        {/* Code Input Area */}
+        
         <div className="w-full rounded-2xl border border-white/[0.06] bg-[#0c0c0e] p-2 sm:p-6 md:p-8 mb-5 overflow-hidden">
           <div className="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2" onPaste={handlePaste}>
             {code.map((char, i) => (
               <div key={i} className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
-                {/* Separator dash after index 3 */}
+                
                 {i === 4 && (
                   <span className="text-2xl sm:text-3xl md:text-4xl font-light text-white/20 mx-0.5 sm:mx-1 md:mx-2 select-none">
                     –
@@ -146,7 +146,7 @@ function JoinRoomContent() {
           </div>
         </div>
 
-        {/* Security Badges */}
+        
         <div className="flex items-center justify-center gap-5 mb-8">
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
@@ -162,7 +162,7 @@ function JoinRoomContent() {
           </div>
         </div>
 
-        {/* Join Button */}
+        
         <button
           id="join-room-btn"
           onClick={handleJoin}
@@ -183,7 +183,7 @@ function JoinRoomContent() {
           )}
         </button>
 
-        {/* Lost key link */}
+        
         <div className="mt-5 text-center">
           <Link
             href="#"
@@ -197,7 +197,7 @@ function JoinRoomContent() {
           </Link>
         </div>
 
-        {/* Footer */}
+        
         <div className="mt-8">
           <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-slate-700 text-center">
             © MMXXIV Synibe. Directed by Design. All Rights Reserved.

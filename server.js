@@ -14,13 +14,13 @@ const io = new Server(httpServer, {
   },
 });
 
-// Track users per room: roomId -> Map<socketId, userName>
+
 const roomUsers = new Map();
 
-// Message history per room: roomId -> ChatMessage[] (capped at 100)
+
 const roomMessages = new Map();
 
-// Video state per room: roomId -> { currentTime, isPlaying, lastUpdated, updatedBy }
+
 const roomVideoState = new Map();
 
 const MAX_MESSAGES = 100;
@@ -31,7 +31,7 @@ function pushMessage(roomId, message) {
   }
   const history = roomMessages.get(roomId);
   history.push(message);
-  // Cap at MAX_MESSAGES
+  
   if (history.length > MAX_MESSAGES) {
     history.splice(0, history.length - MAX_MESSAGES);
   }
@@ -41,14 +41,14 @@ io.on("connection", (socket) => {
   let currentRoom = null;
   let currentUser = null;
 
-  // User joins a room
+  
   socket.on("join-room", ({ roomId, userName }) => {
     currentRoom = roomId;
     currentUser = userName || "Anonymous";
 
     socket.join(roomId);
 
-    // Track this user in the room
+    
     if (!roomUsers.has(roomId)) {
       roomUsers.set(roomId, new Map());
     }
@@ -56,14 +56,14 @@ io.on("connection", (socket) => {
 
     const onlineCount = roomUsers.get(roomId).size;
 
-    // ── Send message history to the joining socket ──
+    
     const history = roomMessages.get(roomId) || [];
     socket.emit("message-history", history);
 
-    // ── Send current video state to the joining socket ──
+    
     const videoState = roomVideoState.get(roomId);
     if (videoState) {
-      // Estimate current position based on elapsed time since last update
+      
       const elapsed = (Date.now() - videoState.lastUpdated) / 1000;
       const estimatedTime = videoState.isPlaying
         ? videoState.currentTime + elapsed
@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
       });
     }
 
-    // ── Create and store the system message ──
+    
     const joinMsg = {
       id: Date.now(),
       type: "system",
@@ -84,20 +84,20 @@ io.on("connection", (socket) => {
     };
     pushMessage(roomId, joinMsg);
 
-    // Notify everyone in the room (including sender)
+    
     io.to(roomId).emit("user-joined", {
       userName: currentUser,
       socketId: socket.id,
       message: joinMsg,
     });
 
-    // Broadcast updated count
+    
     io.to(roomId).emit("online-count", onlineCount);
 
     console.log(`[${roomId}] ${currentUser} joined. Online: ${onlineCount}`);
   });
 
-  // User sends a message
+  
   socket.on("send-message", ({ roomId, text, userName }) => {
     const message = {
       id: Date.now(),
@@ -107,19 +107,19 @@ io.on("connection", (socket) => {
       text,
       timestamp: new Date().toISOString(),
     };
-    // Store in history
+    
     pushMessage(roomId, message);
-    // Broadcast to everyone in the room
+    
     io.to(roomId).emit("new-message", message);
   });
 
-  // ═══════════════════════════════════════════════
-  //  VIDEO SYNC EVENTS
-  // ═══════════════════════════════════════════════
+  
+  
+  
 
-  // A user performed a video action (play, pause, seek)
+  
   socket.on("video-action", ({ roomId, action, currentTime, userName }) => {
-    // Update the authoritative room state
+    
     roomVideoState.set(roomId, {
       currentTime,
       isPlaying: action === "play" || action === "seek-while-playing",
@@ -127,7 +127,7 @@ io.on("connection", (socket) => {
       updatedBy: socket.id,
     });
 
-    // Broadcast to all OTHER sockets in the room
+    
     socket.to(roomId).emit("video-sync", {
       action,
       currentTime,
@@ -140,7 +140,7 @@ io.on("connection", (socket) => {
     );
   });
 
-  // Periodic heartbeat to keep room state fresh (sent by the "oldest" connected client)
+  
   socket.on("video-heartbeat", ({ roomId, currentTime, isPlaying }) => {
     roomVideoState.set(roomId, {
       currentTime,
@@ -150,7 +150,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // User disconnects
+  
   socket.on("disconnect", () => {
     if (!currentRoom || !currentUser) return;
 
@@ -159,7 +159,7 @@ io.on("connection", (socket) => {
       users.delete(socket.id);
       const onlineCount = users.size;
 
-      // Create and store the system message
+      
       const leaveMsg = {
         id: Date.now() + 1,
         type: "system",
@@ -168,7 +168,7 @@ io.on("connection", (socket) => {
       };
       pushMessage(currentRoom, leaveMsg);
 
-      // Notify remaining users
+      
       io.to(currentRoom).emit("user-left", {
         userName: currentUser,
         socketId: socket.id,
@@ -176,7 +176,7 @@ io.on("connection", (socket) => {
       });
       io.to(currentRoom).emit("online-count", onlineCount);
 
-      // Clean up room data if empty
+      
       if (users.size === 0) {
         roomUsers.delete(currentRoom);
         roomMessages.delete(currentRoom);

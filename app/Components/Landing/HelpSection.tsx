@@ -17,7 +17,7 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Help Topics Data ─── */
+
 const helpTopics = [
   {
     number: "01",
@@ -61,7 +61,7 @@ const helpTopics = [
   },
 ];
 
-/* ─── Quick Links Data ─── */
+
 const quickLinks = [
   {
     icon: MonitorPlay,
@@ -105,7 +105,7 @@ const quickLinks = [
   },
 ];
 
-/* ─── Help Topic Card ─── */
+
 function HelpTopicCard({
   topic,
   index,
@@ -119,9 +119,9 @@ function HelpTopicCard({
     <div
       className={`flex flex-col ${isReversed ? "lg:flex-row-reverse" : "lg:flex-row"} gap-8 lg:gap-14 items-start`}
     >
-      {/* Number + Content */}
+      
       <div className="flex-1 min-w-0">
-        {/* Number badge */}
+        
         <div className="flex items-center gap-4 mb-5">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
@@ -140,17 +140,17 @@ function HelpTopicCard({
           />
         </div>
 
-        {/* Title */}
+        
         <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-4 leading-snug">
           {topic.title}
         </h3>
 
-        {/* Description */}
+        
         <p className="text-sm sm:text-base text-white/50 leading-relaxed mb-6">
           {topic.content}
         </p>
 
-        {/* Highlight chips */}
+        
         <div className="flex flex-wrap gap-3">
           {topic.highlights.map((h, i) => (
             <div
@@ -177,7 +177,7 @@ function HelpTopicCard({
         </div>
       </div>
 
-      {/* Visual card on the side */}
+      
       <div
         className="w-full lg:w-[280px] shrink-0 rounded-2xl p-6 relative overflow-hidden"
         style={{
@@ -186,13 +186,13 @@ function HelpTopicCard({
           backdropFilter: "blur(12px)",
         }}
       >
-        {/* Corner accents */}
+        
         <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-white/20" />
         <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-white/20" />
         <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-white/20" />
         <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-white/20" />
 
-        {/* Decorative content */}
+        
         <div className="space-y-3">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
@@ -208,7 +208,7 @@ function HelpTopicCard({
             </span>
           </div>
 
-          {/* Mini visual bars */}
+          
           {[75, 60, 90, 45].map((w, i) => (
             <div key={i} className="flex items-center gap-2">
               <div
@@ -236,7 +236,7 @@ function HelpTopicCard({
   );
 }
 
-/* ─── Main Help Section ─── */
+
 export default function HelpSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -247,7 +247,7 @@ export default function HelpSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header entrance
+      
       gsap.fromTo(
         headerRef.current,
         { y: 50, opacity: 0 },
@@ -263,7 +263,7 @@ export default function HelpSection() {
         }
       );
 
-      // Stagger topic cards
+      
       gsap.fromTo(
         topicsRef.current.filter(Boolean),
         { y: 50, opacity: 0 },
@@ -280,7 +280,7 @@ export default function HelpSection() {
         }
       );
 
-      // Quick links section
+      
       if (quickLinksRef.current) {
         gsap.fromTo(
           quickLinksRef.current,
@@ -298,7 +298,7 @@ export default function HelpSection() {
         );
       }
 
-      // Quick link items stagger
+      
       gsap.fromTo(
         quickLinkItemsRef.current.filter(Boolean),
         { y: 25, opacity: 0 },
@@ -315,7 +315,7 @@ export default function HelpSection() {
         }
       );
 
-      // CTA entrance
+      
       if (ctaRef.current) {
         gsap.fromTo(
           ctaRef.current,
@@ -343,7 +343,7 @@ export default function HelpSection() {
       ref={sectionRef}
       className="relative w-full py-28 sm:py-36 overflow-hidden bg-black"
     >
-      {/* Ambient glow top */}
+      
       <div
         className="absolute pointer-events-none"
         style={{
@@ -357,7 +357,7 @@ export default function HelpSection() {
         }}
       />
 
-      {/* Ambient glow bottom */}
+      
       <div
         className="absolute pointer-events-none"
         style={{
@@ -371,9 +371,9 @@ export default function HelpSection() {
       />
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">
-        {/* ─── Section Header ─── */}
+        
         <div ref={headerRef} className="mb-20" style={{ opacity: 0 }}>
-          {/* Label */}
+          
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-8 h-[2px]"
@@ -392,7 +392,7 @@ export default function HelpSection() {
             />
           </div>
 
-          {/* Title */}
+          
           <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
             Help{" "}
             <span
@@ -407,12 +407,12 @@ export default function HelpSection() {
             </span>
           </h2>
 
-          {/* Subtitle */}
+          
           <p className="text-base sm:text-lg text-white/40 max-w-xl leading-relaxed">
             Find answers, explore features, and learn how to get the most out of Synibe .
           </p>
 
-          {/* Decorative line */}
+          
           <div
             className="w-full h-[1px] mt-10"
             style={{
@@ -422,7 +422,7 @@ export default function HelpSection() {
           />
         </div>
 
-        {/* ─── Help Topics ─── */}
+        
         <div className="space-y-20">
           {helpTopics.map((topic, i) => (
             <div
@@ -437,9 +437,9 @@ export default function HelpSection() {
           ))}
         </div>
 
-        {/* ─── Quick Links Grid ─── */}
+        
         <div ref={quickLinksRef} className="mt-28" style={{ opacity: 0 }}>
-          {/* Section label */}
+          
           <div className="flex items-center gap-3 mb-8">
             <div
               className="w-8 h-[2px]"
@@ -472,7 +472,7 @@ export default function HelpSection() {
             </span>
           </h3>
 
-          {/* Grid */}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickLinks.map((link, i) => {
               const Icon = link.icon;
@@ -519,7 +519,7 @@ export default function HelpSection() {
                     {link.desc}
                   </p>
 
-                  {/* Arrow */}
+                  
                   <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <svg
                       width="14"
@@ -542,7 +542,7 @@ export default function HelpSection() {
           </div>
         </div>
 
-        {/* ─── Contact Us CTA ─── */}
+        
         <div ref={ctaRef} className="mt-28" style={{ opacity: 0 }}>
           <div
             className="relative rounded-3xl p-10 sm:p-14 overflow-hidden text-center"
@@ -551,7 +551,7 @@ export default function HelpSection() {
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
-            {/* Glow background */}
+            
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -560,7 +560,7 @@ export default function HelpSection() {
               }}
             />
 
-            {/* Corner accents */}
+            
             <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-white/15" />
             <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-white/15" />
             <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-white/15" />
@@ -603,7 +603,7 @@ export default function HelpSection() {
           </div>
         </div>
 
-        {/* Bottom spacer text */}
+        
         <p className="text-center text-xs text-white/20 mt-12 tracking-wide">
           Can&apos;t find what you need?{" "}
           <Link

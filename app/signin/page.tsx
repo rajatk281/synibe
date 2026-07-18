@@ -1,18 +1,18 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-// import Image from "next/image";
+
 import Link from "next/link";
 
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background gradient orbs */}
+      
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="card w-full max-w-md mx-4 p-8 rounded-2xl relative z-10">
-        {/* Header */}
+        
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -23,7 +23,7 @@ export default function SignInPage() {
           <p className="text-sm text-gray-400">Sign in to continue to Synibe</p>
         </div>
 
-        {/* Google Sign In Button */}
+        
         <button
           onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer group"
@@ -51,14 +51,14 @@ export default function SignInPage() {
           </span>
         </button>
 
-        {/* Divider */}
+        
         <div className="flex items-center gap-3 my-6">
           <div className="flex-1 h-px bg-white/10" />
           <span className="text-xs text-gray-500 uppercase tracking-wider">or</span>
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        {/* Additional info */}
+        
         <p className="text-center text-xs text-gray-500">
           By signing in, you agree to our{" "}
           <Link href="/" className="text-purple-400 hover:text-purple-300 transition-colors">

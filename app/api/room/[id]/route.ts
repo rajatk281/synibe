@@ -12,7 +12,7 @@ export async function GET(
   const { id } = await params;
   const normalizedId = id.toLowerCase().replace(/-/g, "");
 
-  // ── Query DB (optimized: no more full-table scan) ──
+  
   const allRooms = await db
     .select()
     .from(rooms)

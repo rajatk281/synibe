@@ -27,9 +27,9 @@ import VideoCall from "@/app/Components/vc";
 const EMOJI_REACTIONS = ["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬"];
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL ?? "";
-const HEARTBEAT_INTERVAL = 3000; // 3 seconds
+const HEARTBEAT_INTERVAL = 3000; 
 
-/* ── Types ── */
+
 type MessageSide = "left" | "right" | "system";
 
 interface ChatMessage {
@@ -58,7 +58,7 @@ function formatVideoTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-/* ── YouTube URL detection ── */
+
 function getYouTubeVideoId(url: string): string | null {
   if (!url) return null;
   const match = url.match(
@@ -67,7 +67,7 @@ function getYouTubeVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 declare global {
   interface Window {
     YT: any;
@@ -88,7 +88,7 @@ export default function RoomPage() {
 
     
 
-  /* ── State ── */
+  
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -134,11 +134,11 @@ export default function RoomPage() {
   const isDraggingVC = useRef(false);
   const vcDragOffset = useRef({ x: 0, y: 0 });
 
-  /* ── Derived: is this a YouTube URL? ── */
+  
   const youtubeId = getYouTubeVideoId(videoUrl);
   const isYouTube = !!youtubeId;
 
-  /* ── Helper: show a sync toast ── */
+  
   const showSyncToast = useCallback((text: string) => {
     const id = Date.now() + Math.random();
     setSyncToasts((prev) => [...prev, { id, text }]);
@@ -147,7 +147,7 @@ export default function RoomPage() {
     }, 3000);
   }, []);
 
-  /* ── Fetch room data from API ── */
+  
   useEffect(() => {
     async function fetchRoom() {
       try {
@@ -166,13 +166,13 @@ export default function RoomPage() {
     if (roomId) fetchRoom();
   }, [roomId]);
 
-  /* ── YouTube IFrame API ── */
+  
   useEffect(() => {
     if (!youtubeId || roomLoading) return;
 
     function createPlayer() {
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
+        try { ytPlayerRef.current.destroy(); } catch {  }
         ytPlayerRef.current = null;
       }
 
@@ -196,12 +196,12 @@ export default function RoomPage() {
             setDuration(event.target.getDuration());
             setIsPlaying(true);
 
-            // Poll current time since YT has no native timeupdate
+            
             if (ytTimeUpdateRef.current) clearInterval(ytTimeUpdateRef.current);
             ytTimeUpdateRef.current = setInterval(() => {
               if (ytPlayerRef.current?.getCurrentTime) {
                 setCurrentTime(ytPlayerRef.current.getCurrentTime());
-                // Also keep duration updated (YT reports 0 initially)
+                
                 const dur = ytPlayerRef.current.getDuration();
                 if (dur > 0) setDuration(dur);
               }
@@ -214,7 +214,7 @@ export default function RoomPage() {
             } else if (s === window.YT.PlayerState.PAUSED) {
               if (!isRemoteAction.current) setIsPlaying(false);
             } else if (s === window.YT.PlayerState.ENDED) {
-              // Loop: restart
+              
               ytPlayerRef.current?.seekTo(0);
               ytPlayerRef.current?.playVideo();
             }
@@ -223,7 +223,7 @@ export default function RoomPage() {
       });
     }
 
-    // Load the IFrame API script if needed
+    
     if (window.YT?.Player) {
       createPlayer();
     } else {
@@ -242,14 +242,14 @@ export default function RoomPage() {
         ytTimeUpdateRef.current = null;
       }
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
+        try { ytPlayerRef.current.destroy(); } catch {  }
         ytPlayerRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [youtubeId, roomLoading]);
 
-  /* ── Helper: emit video action ── */
+  
   const emitVideoAction = useCallback(
     (action: string, time: number) => {
       if (!socketRef.current || isRemoteAction.current) return;
@@ -263,7 +263,7 @@ export default function RoomPage() {
     [roomId, userName]
   );
 
-  /* ── Socket setup ── */
+  
   useEffect(() => {
     if (status === "loading") return;
 
@@ -273,7 +273,7 @@ export default function RoomPage() {
     socket.on("connect", () => {
       setMySocketId(socket.id ?? null);
       setConnected(true);
-      // Announce joining the room
+      
       socket.emit("join-room", { roomId, userName });
     });
 
@@ -285,7 +285,7 @@ export default function RoomPage() {
       setOnlineCount(count);
     });
 
-    // ── Message history from server (on join) ──
+    
     socket.on("message-history", (history: Array<{
       id: number;
       type: "chat" | "system";
@@ -309,7 +309,7 @@ export default function RoomPage() {
       setMessages(mapped);
     });
 
-    // ── User joined (system message comes from server) ──
+    
     socket.on("user-joined", ({ message }: {
       userName: string;
       socketId: string;
@@ -327,7 +327,7 @@ export default function RoomPage() {
       ]);
     });
 
-    // ── User left (system message comes from server) ──
+    
     socket.on("user-left", ({ message }: {
       userName: string;
       socketId: string;
@@ -345,7 +345,7 @@ export default function RoomPage() {
       ]);
     });
 
-    // ── New chat message ──
+    
     socket.on(
       "new-message",
       ({
@@ -375,11 +375,11 @@ export default function RoomPage() {
       }
     );
 
-    // ═══════════════════════════════════════════════
-    //  VIDEO SYNC — incoming events
-    // ═══════════════════════════════════════════════
+    
+    
+    
 
-    // ── Video state on join (sync to room's current position) ──
+    
     socket.on("video-state", ({ currentTime: time, isPlaying: playing }: {
       currentTime: number;
       isPlaying: boolean;
@@ -401,7 +401,7 @@ export default function RoomPage() {
       setTimeout(() => { isRemoteAction.current = false; }, 200);
     });
 
-    // ── Remote user performed a video action ──
+    
     socket.on("video-sync", ({ action, currentTime: time, userName: who }: {
       action: string;
       currentTime: number;
@@ -414,7 +414,7 @@ export default function RoomPage() {
       const video = videoRef.current;
 
       if (yt?.seekTo) {
-        // YouTube player
+        
         switch (action) {
           case "play":
             yt.seekTo(time, true); yt.playVideo(); setIsPlaying(true);
@@ -432,7 +432,7 @@ export default function RoomPage() {
             break;
         }
       } else if (video) {
-        // Native video player
+        
         switch (action) {
           case "play":
             video.currentTime = time; video.play().catch(() => { }); setIsPlaying(true);
@@ -457,16 +457,16 @@ export default function RoomPage() {
     return () => {
       socket.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [roomId, userName, status, showSyncToast]);
 
-  /* ── Auto-scroll chat ── */
+  
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     fullscreenChatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isFullscreen, showFullscreenChat]);
 
-  /* ── Fullscreen change listener ── */
+  
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -477,14 +477,14 @@ export default function RoomPage() {
     };
   }, []);
 
-  /* ── Browser back-button & tab-close warning ── */
+  
   useEffect(() => {
-    // Warn on tab close / refresh
+    
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
     };
 
-    // Intercept browser back button
+    
     window.history.pushState(null, "", window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.href);
@@ -497,11 +497,11 @@ export default function RoomPage() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, []);
   
 
-  /* ── Video time tracking ── */
+  
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -529,7 +529,7 @@ export default function RoomPage() {
     };
   }, []);
 
-  /* ── Heartbeat: send video position every 3s while playing ── */
+  
   useEffect(() => {
     if (heartbeatRef.current) {
       clearInterval(heartbeatRef.current);
@@ -569,7 +569,7 @@ export default function RoomPage() {
     };
   }, [isPlaying, connected, roomId]);
 
-  /* ── Panel resize & VC drag (global mouse events) ── */
+  
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isResizingPanel.current) {
@@ -596,7 +596,7 @@ export default function RoomPage() {
     };
   }, []);
 
-  /* ── Handlers ── */
+  
   const sendMessage = useCallback(() => {
     if (!newMsg.trim() || !socketRef.current) return;
     socketRef.current.emit("send-message", {
@@ -731,23 +731,23 @@ export default function RoomPage() {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  /* ── Render ── */
+  
   return (
     <div className="h-screen bg-[#060612] flex flex-col lg:flex-row overflow-hidden">
-      {/* ═══════════════════════════════════════════════ */}
-      {/*  LEFT — Video Player Area                      */}
-      {/* ═══════════════════════════════════════════════ */}
+      
+      
+      
       <div className="flex-1  flex flex-col relative min-h-0 ">
-        {/* Video container */}
+        
         <div ref={playerContainerRef} className="flex-1 relative overflow-hidden bg-black ">
-          {/* Conditional: YouTube embed or native <video> */}
+          
           {isYouTube ? (
             <div className="absolute inset-0 w-full h-full">
               <div
                 id="yt-player-target"
                 className="w-full h-full"
               />
-              {/* Transparent overlay to block YT clickjacking and let our controls work */}
+              
               <div
                 onClick={togglePlay}
                 className="absolute inset-0 z-[1] cursor-pointer"
@@ -772,7 +772,7 @@ export default function RoomPage() {
             />
           )}
 
-          {/* Loading overlay while fetching room data */}
+          
           {roomLoading && (
             <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#060612]">
               <div className="flex flex-col items-center gap-4">
@@ -784,7 +784,7 @@ export default function RoomPage() {
             </div>
           )}
 
-          {/* No video URL fallback */}
+          
           {!roomLoading && !videoUrl && (
             <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#060612]">
               <div className="flex flex-col items-center gap-3 text-center px-6">
@@ -801,10 +801,10 @@ export default function RoomPage() {
             </div>
           )}
 
-          {/* ── Fullscreen Floating Chat Panel ── */}
+          
           {isFullscreen && showFullscreenChat && (
             <div className="absolute top-20 right-5  bottom-28 w-80 lg:w-96 bg-transparent flex flex-col overflow-hidden z-30 room-msg-appear">
-              {/* Header */}
+              
               <div className="flex items-center justify-between px-4 py-3 bg-transparent">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-3.5 h-3.5 " />
@@ -820,7 +820,7 @@ export default function RoomPage() {
                 </button>
               </div>
 
-              {/* Messages */}
+              
               <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin">
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30">
@@ -868,7 +868,7 @@ export default function RoomPage() {
                 <div ref={fullscreenChatEndRef} />
               </div>
 
-              {/* Input */}
+              
               <div className="px-3 py-2 bg-transparent">
                 <div className="flex items-center gap-2 bg-[#0a0a14]/70 backdrop-blur-md rounded-lg border border-white/[0.1] px-2.5 py-1.5 focus-within:border-neutral-500/50 transition-all duration-300 shadow-lg">
                   <input
@@ -891,12 +891,12 @@ export default function RoomPage() {
             </div>
           )}
 
-          {/* Top overlay gradient */}
+          
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10 pointer-events-none" />
-          {/* Bottom overlay gradient */}
+          
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#060612] via-[#060612]/60 to-transparent z-10 pointer-events-none" />
 
-          {/* ── Top-left: Title & viewers ── */}
+          
           <div className="absolute top-5 left-5 z-20 ">
             <h2 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2 ">
               <span className="text-white/70">
@@ -911,7 +911,7 @@ export default function RoomPage() {
             </div>
           </div>
 
-          {/* ── Sync toast notifications ── */}
+          
           <div className="absolute top-5 right-5 z-30 flex flex-col gap-2 items-end">
             {syncToasts.map((toast) => (
               <div
@@ -923,17 +923,17 @@ export default function RoomPage() {
             ))}
           </div>
 
-          {/* ── Floating emoji reaction ── */}
+          
           {activeReaction && (
             <div className="absolute  bottom-32 left-1/2 -translate-x-1/2 z-30 text-6xl room-reaction-float pointer-events-none">
               {activeReaction}
             </div>
           )}
 
-          {/* ── Bottom controls ── */}
+          
           <div className="absolute bottom-0 left-0 right-0 z-20 px-3 sm:px-5 pb-3 sm:pb-4 pointer-events-none">
 
-            {/* Progress bar — clickable to seek */}
+            
             <div
               ref={progressBarRef}
               onClick={handleSeek}
@@ -949,7 +949,7 @@ export default function RoomPage() {
               />
             </div>
 
-            {/* Controls row */}
+            
             <div className="flex items-center justify-between pointer-events-auto">
               <div className="flex items-center gap-2 sm:gap-3">
                 <button
@@ -979,7 +979,7 @@ export default function RoomPage() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* Mobile chat toggle */}
+                
                 <button
                   onClick={() => setShowMobileChat(!showMobileChat)}
                   className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 cursor-pointer lg:hidden ${showMobileChat
@@ -1031,13 +1031,13 @@ export default function RoomPage() {
             </div>
           </div>
 
-          {/* ── Draggable floating VC overlay — visible in fullscreen ── */}
+          
           {isFullscreen && inVideoCall && liveKitToken && showFullscreenVC && (
             <div
               className="absolute z-40 rounded-2xl overflow-hidden shadow-2xl shadow-black/70 border border-white/[0.12] select-none"
               style={{ left: vcPos.x, top: vcPos.y, width: 280, height: 215 }}
             >
-              {/* Drag handle bar */}
+              
               <div
                 className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/90 via-black/60 to-transparent flex items-center justify-between px-3 z-50 cursor-grab active:cursor-grabbing"
                 onMouseDown={handleVCDragStart}
@@ -1075,32 +1075,32 @@ export default function RoomPage() {
       </div>
       {ExitBtn && (
   <div className="fixed inset-0 z-50 flex items-center justify-center">
-    {/* Backdrop */}
+    
     <div
       className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       onClick={handleNoBtn}
     />
 
-    {/* Modal */}
+    
     <div className="relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
       
-      {/* Warning Icon */}
+      
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
         <span className="text-3xl">⚠️</span>
       </div>
 
-      {/* Heading */}
+      
       <h2 className="mt-4 text-center text-xl font-bold text-gray-900">
         Leave Room?
       </h2>
 
-      {/* Description */}
+      
       <p className="mt-2 text-center text-sm text-gray-600">
         You will be disconnected from the synced session and stop watching
         together with other participants.
       </p>
 
-      {/* Buttons */}
+      
       <div className="mt-6 flex justify-center gap-3">
         <button
           onClick={handleNoBtn}
@@ -1155,10 +1155,10 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════ */}
-      {/*  RIGHT — Chat Panel                            */}
-      {/* ═══════════════════════════════════════════════ */}
-      {/* Show-panel button when collapsed */}
+      
+      
+      
+      
       {!showRightPanel && (
         <button
           onClick={() => setShowRightPanel(true)}
@@ -1178,7 +1178,7 @@ export default function RoomPage() {
           transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1), min-width 0.3s cubic-bezier(0.4,0,0.2,1)',
         }}
       >
-        {/* Resize drag handle on left edge */}
+        
         <div
           className="absolute left-0 top-0 h-full w-3 z-50 cursor-col-resize group flex items-center "
           onMouseDown={handlePanelResizeStart}
@@ -1199,7 +1199,7 @@ export default function RoomPage() {
             />
           </div>
         )}
-        {/* Chat header */}
+        
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 " />
@@ -1209,7 +1209,7 @@ export default function RoomPage() {
             <span className="ml-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold  uppercase tracking-wider">
               {onlineCount} Online
             </span>
-            {/* Connection indicator */}
+            
             <span
               className={`w-1.5 h-1.5 rounded-full ml-1 ${connected ? "bg-green-400 animate-pulse" : "bg-red-500"
                 }`}
@@ -1217,7 +1217,7 @@ export default function RoomPage() {
             />
           </div>
           <div className="flex items-center gap-1.5">
-            {/* Video Call toggle */}
+            
             <button
               id="video-call-btn"
               onClick={() => {
@@ -1239,7 +1239,7 @@ export default function RoomPage() {
             >
               <Video className="w-3.5 h-3.5" />
             </button>
-            {/* Audio Call toggle */}
+            
             <button
               id="audio-call-btn"
               onClick={() => {
@@ -1272,7 +1272,7 @@ export default function RoomPage() {
           </div>
         </div>
 
-        {/* Chat messages */}
+        
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-thin ">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full gap-2 opacity-30">
@@ -1284,7 +1284,7 @@ export default function RoomPage() {
           )}
 
           {messages.map((msg) => {
-            /* System notification */
+            
             if (msg.type === "system") {
               return (
                 <div
@@ -1300,14 +1300,14 @@ export default function RoomPage() {
               );
             }
 
-            /* Chat bubble */
+            
             return (
               <div
                 key={msg.id}
                 className={`flex gap-2.5 ${msg.side === "right" ? "flex-row-reverse" : ""
                   } room-msg-appear`}
               >
-                {/* Bubble */}
+                
                 <div
                   className={`max-w-[80%] ${msg.side === "right" ? "items-end" : "items-start"
                     } flex flex-col`}
@@ -1335,7 +1335,7 @@ export default function RoomPage() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Chat input */}
+        
         <div className="px-4 py-3 border-t border-white/[0.06]">
           <div className="flex items-center gap-2 bg-white/[0.04] rounded-xl border border-white/[0.06] px-3 py-2 focus-within:border-slate-500/30 transition-all duration-300">
             <button
@@ -1364,7 +1364,7 @@ export default function RoomPage() {
             </button>
           </div>
 
-          {/* Quick emoji picker */}
+          
           {showEmojis && (
             <div className="mt-2 flex items-center gap-1 flex-wrap px-1 room-emojis-appear" draggable={true}>
               {["😍", "🔥", "💀", "❤️", "💜", "😂", "👏", "🎬", "😮", "🥺", "💯", "🫡"].map(

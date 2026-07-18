@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
-/* ------------------ ROOT THEME ------------------ */
+
 :root {
-  /* Cinematic Dark Background */
+  
   --background: #050507;
   --background-soft: #0b0b12; 
 
-  /* Text */
+  
   --foreground: #e5e7eb;
   --foreground-muted: #9ca3af;
 
-  /* Accent (Synibe Purple/Pink) */
+  
   --accent: #8829e0;
   --accent-soft: #fa21bd;
 
-  /* Borders / Cards */
+  
   --border: rgba(255, 255, 255, 0.08);
   --card: rgba(255, 255, 255, 0.03);
 
-  /* Glow */
+  
   --glow: 168, 85, 247;
 }
 
-/* ------------------ TAILWIND THEME ------------------ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -37,7 +37,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* ------------------ BASE STYLES ------------------ */
+
 body {
   background: black;
   color: var(--foreground);
@@ -46,7 +46,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ------------------ TEXT ------------------ */
+
 h1, h2, h3, h4 {
   letter-spacing: -0.02em;
 }
@@ -55,15 +55,15 @@ p {
   color: var(--foreground-muted);
 }
 
-/* ------------------ CARD STYLE ------------------ */
+
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
-  /* border-radius: 1rem; */
+  
 }
 
-/* ------------------ BUTTON ------------------ */
+
 .btn-primary {
   background: linear-gradient(
     135deg,
@@ -81,12 +81,12 @@ p {
   transform: translateY(-1px);
 }
 
-/* ------------------ GLOW EFFECT ------------------ */
+
 .glow {
   box-shadow: 0 0 40px rgba(var(--glow), 0.25);
 }
 
-/* ------------------ SCROLLBAR ------------------ */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -96,7 +96,7 @@ p {
   border-radius: 10px;
 }
 
-/* ------------------ FLOAT ANIMATIONS ------------------ */
+
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(12deg); }
   50% { transform: translateY(-12px) rotate(12deg); }
@@ -116,7 +116,7 @@ p {
   animation-delay: 1s;
 }
 
-/* ------------------ CARD REVEAL ANIMATIONS ------------------ */
+
 .card-reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -133,7 +133,7 @@ p {
   transform: translateY(0);
 }
 
-/* ------------------ STREAM MODAL ANIMATIONS ------------------ */
+
 @keyframes modal-fade-in {
   from {
     opacity: 0;
@@ -163,7 +163,7 @@ p {
   opacity: 0;
 }
 
-/* ------------------ JOIN MASCOT FLOAT ------------------ */
+
 @keyframes join-mascot-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -173,7 +173,7 @@ p {
   animation: join-mascot-float 3.5s ease-in-out infinite;
 }
 
-/* ------------------ ROOM PAGE ANIMATIONS ------------------ */
+
 @keyframes room-reaction-float {
   0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
   60% { opacity: 1; }
@@ -202,7 +202,7 @@ p {
   animation: room-emojis-appear 0.25s ease-out forwards;
 }
 
-/* ------------------ PROFILE DROPDOWN ANIMATION ------------------ */
+
 @keyframes dropdown-in {
   from {
     opacity: 0;
@@ -218,7 +218,7 @@ p {
   animation: dropdown-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ------------------ SYNC TOAST ANIMATION ------------------ */
+
 @keyframes sync-toast-in {
   from {
     opacity: 0;
@@ -245,7 +245,7 @@ p {
              sync-toast-fade 3s ease-in-out forwards;
 }
 
-/* ------------------ YOUTUBE EMBED FILL ------------------ */
+
 #yt-player-target {
   width: 100% !important;
   height: 100% !important;

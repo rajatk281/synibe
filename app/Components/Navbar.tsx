@@ -25,7 +25,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLLIElement>(null);
 
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -36,7 +36,7 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  
   useEffect(() => {
     if (mobileOpen) {
       document.body.style.overflow = "hidden";
@@ -60,14 +60,14 @@ const Navbar = () => {
   return (
     <>
       <div className="fixed card z-50 w-full flex justify-between items-center rounded-none text-sm select-none px-2 sm:px-4">
-        {/* Left: Brand + Desktop Nav Links */}
+        
         <ul className="flex gap-2 sm:gap-4 justify-center items-center">
           <Link href="/" onClick={(e) => handleClick(e, "/")}>
             <li className="p-3 sm:p-4 font-bold text-lg sm:text-xl">
               {navlinks.name}
             </li>
           </Link>
-          {/* Desktop nav links — hidden on mobile */}
+          
           {navlinks.links.map((link, index) => (
             <li
               className="p-2 hover:text-purple-400 transition-all duration-700 hidden md:block"
@@ -80,7 +80,7 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Right: Actions */}
+        
         <ul className="flex gap-2 sm:gap-4 justify-center items-center px-2 sm:px-4">
 
           {session ? (
@@ -98,10 +98,10 @@ const Navbar = () => {
                 />
               </button>
 
-              {/* Dropdown Menu */}
+              
               {isMenuOpen && (
                 <div className="absolute right-0 mt-3 w-64 rounded-xl overflow-hidden border border-white/10 bg-[#0d0d14]/95 backdrop-blur-xl shadow-2xl shadow-purple-900/20 z-50 animate-in">
-                  {/* User Info Header */}
+                  
                   <div className="px-4 py-4 border-b border-white/10">
                     <div className="flex items-center gap-3">
                       <Image
@@ -122,29 +122,13 @@ const Navbar = () => {
                     </div>
                   </div>
 
-                  {/* Menu Items */}
+                  
                   <div className="py-2">
-                    {/* <button
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 cursor-pointer"
-                    >
-                      <User size={16} />
-                      <span>Profile</span>
-                    </button> */}
-                    {/* <button
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 cursor-pointer"
-                    >
-                      <Settings size={16} />
-                      <span>Settings</span>
-                    </button> */}
+                    
+                    
                   </div>
 
-                  {/* Logout */}
+                  
                   <div className="border-t border-white/10 py-2">
                     <button
                       onClick={() => {
@@ -169,7 +153,7 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Hamburger — visible only on mobile */}
+          
           <li className="md:hidden">
             <button
               onClick={() => setMobileOpen((prev) => !prev)}
@@ -182,16 +166,16 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {/* ── Mobile Drawer ── */}
+      
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
-          {/* Backdrop */}
+          
           <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
 
-          {/* Drawer panel */}
+          
           <div
             className="absolute top-[56px] left-0 right-0 bg-[#0a0a12]/98 backdrop-blur-xl border-b border-white/10 overflow-y-auto"
             style={{ maxHeight: "calc(100vh - 56px)" }}

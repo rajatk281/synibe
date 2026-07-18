@@ -31,7 +31,7 @@ export default function PhoneShowcase() {
   const [loadVideo, setLoadVideo] = useState(false);
 
   useEffect(() => {
-    // Only load the heavy video source if we are on a desktop width (>= 1024px)
+    
     if (window.innerWidth >= 1024) {
       setLoadVideo(true);
     }
@@ -39,7 +39,7 @@ export default function PhoneShowcase() {
 
   useEffect(() => {
     const isDesktop = window.innerWidth >= 1024;
-    if (!isDesktop) return; // Skip GSAP on mobile
+    if (!isDesktop) return; 
 
     const section = sectionRef.current;
     const phone = phoneRef.current;
@@ -50,7 +50,7 @@ export default function PhoneShowcase() {
     if (!section || !phone || !v1 || !v2 || !c1 || !c2) return;
 
     const ctx = gsap.context(() => {
-      // Initial states
+      
       gsap.set(phone, { rotation: -90, x: "18vw" });
       gsap.set(c2, { opacity: 0, x: 80 });
       gsap.set(v2, { opacity: 0 });
@@ -65,28 +65,28 @@ export default function PhoneShowcase() {
         },
       });
 
-      // 0–1: Hold Section 1 (video sharing visible)
+      
 
-      // 1–1.5: Fade out content 1
+      
       tl.to(c1, { opacity: 0, x: -80, duration: 0.5, ease: "power2.in" }, 0);
 
-      // 1–2: Rotate phone landscape→portrait, move right→left
+      
       tl.to(phone, { rotation: 0, x: "-20vw", y:"3vh", duration: 1, ease: "power3.inOut" }, 0.1);
 
-      // 1.2–1.8: Crossfade videos
+      
       tl.to(v1, { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 0.4);
       tl.to(v2, { opacity: 1, duration: 0.6, ease: "power1.inOut" }, 0.6);
 
-      // 1.5–2: Fade in content 2
+      
       tl.to(c2, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.7);
 
-      // 2–3: Hold Section 2 (audio listening visible)
+      
     });
 
     return () => ctx.revert();
   }, []);
 
-  /* ── Feature Card Component ── */
+  
   const FeatureCard = ({ f }: { f: { title: string; desc: string; icon: string } }) => (
     <div className="flex items-start gap-3 sm:gap-4 ">
       <div
@@ -107,9 +107,9 @@ export default function PhoneShowcase() {
 
   return (
     <>
-      {/* ── Mobile Layout (static, no GSAP pinning) — visible only below lg breakpoint ── */}
+      
       <section className="lg:hidden relative overflow-hidden bg-black pt-16 sm:py-24 select-none">
-        {/* Video Section */}
+        
         <div className="max-w-lg mx-auto px-5 sm:px-6 sm:mb-20 mt-42 pt-4 ">
           <div className="flex items-center gap-3 mb-4 ">
             <div
@@ -141,7 +141,7 @@ export default function PhoneShowcase() {
           </div>
         </div>
 
-        {/* Audio Section */}
+        
         <div className="max-w-lg mx-auto px-5 sm:px-6 ">
           <div className="flex items-center gap-3 mb-4">
             <div
@@ -173,7 +173,7 @@ export default function PhoneShowcase() {
           </div>
         </div>
 
-        {/* Ambient glow */}
+        
         <div
           className="absolute pointer-events-none z-0 "
           style={{
@@ -187,12 +187,12 @@ export default function PhoneShowcase() {
         />
       </section>
 
-      {/* ── Desktop Layout (GSAP pinned animation) — visible only from lg breakpoint ── */}
+      
       <section
         ref={sectionRef}
         className="hidden lg:block relative w-full h-screen overflow-hidden bg-black"
       >
-        {/* ── Content 1: Video Sharing (left side) ── */}
+        
         <div
           ref={content1Ref}
           className="absolute left-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 ml-10 "
@@ -227,7 +227,7 @@ export default function PhoneShowcase() {
           </div>
         </div>
 
-        {/* ── Phone Container ── */}
+        
         <div
           ref={phoneRef}
           className="absolute top-1/2 left-1/2 rounded-2xl z-10"
@@ -240,7 +240,7 @@ export default function PhoneShowcase() {
             filter: "drop-shadow(0 0 40px rgba(var(--glow), 0.2))",
           }}
         >
-          {/* Screen area — inset values measured from phone.com.png pixel data */}
+          
           <div
             className="absolute overflow-hidden rounded-4xl mx-8 "
             style={{
@@ -250,7 +250,7 @@ export default function PhoneShowcase() {
               bottom: '4.3%',
             }}
           >
-            {/* Video 1: landscape video, counter-rotated +90° to appear correct when phone is at -90° */}
+            
             <video
               ref={video1Ref}
               src={loadVideo ? "https://res.cloudinary.com/dwect2foi/video/upload/v1781797821/35266-407130741_medium_jeogdj.mp4" : undefined}
@@ -264,7 +264,7 @@ export default function PhoneShowcase() {
               }}
             />
 
-            {/* Video 2: portrait video, normal orientation */}
+            
             <video
               ref={video2Ref}
               src={loadVideo ? "/Videos/musicplayer.mp4" : undefined}
@@ -276,7 +276,7 @@ export default function PhoneShowcase() {
             />
           </div>
 
-          {/* Phone frame overlay — sits on top of everything */}
+          
           <Image
             src="/phone.com.png"
             alt="Phone"
@@ -287,7 +287,7 @@ export default function PhoneShowcase() {
           />
         </div>
 
-        {/* ── Content 2: Audio Listening (right side) ── */}
+        
         <div
           ref={content2Ref}
           className="absolute right-[8%] top-1/2 -translate-y-1/2 w-[32%] z-10 mr-10"
@@ -322,7 +322,7 @@ export default function PhoneShowcase() {
           </div>
         </div>
 
-        {/* Ambient glow */}
+        
         <div
           className="absolute pointer-events-none z-0"
           style={{

@@ -17,7 +17,7 @@ import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Data ─── */
+
 
 const stats = [
   { value: "50K+", label: "Active Users" },
@@ -103,7 +103,7 @@ const team = [
   },
 ];
 
-/* ─── Component ─── */
+
 
 export default function AboutSection() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -119,7 +119,7 @@ export default function AboutSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      /* Hero entrance */
+      
       if (heroRef.current) {
         gsap.fromTo(
           heroRef.current.children,
@@ -135,7 +135,7 @@ export default function AboutSection() {
         );
       }
 
-      /* Stats counter animation */
+      
       gsap.fromTo(
         statsRef.current.filter(Boolean),
         { y: 40, opacity: 0, scale: 0.9 },
@@ -153,7 +153,7 @@ export default function AboutSection() {
         }
       );
 
-      /* Story section */
+      
       if (storyRef.current) {
         gsap.fromTo(
           storyRef.current,
@@ -171,7 +171,7 @@ export default function AboutSection() {
         );
       }
 
-      /* Values header */
+      
       if (valuesHeaderRef.current) {
         gsap.fromTo(
           valuesHeaderRef.current,
@@ -189,7 +189,7 @@ export default function AboutSection() {
         );
       }
 
-      /* Value cards stagger */
+      
       gsap.fromTo(
         valuesRef.current.filter(Boolean),
         { y: 40, opacity: 0 },
@@ -206,7 +206,7 @@ export default function AboutSection() {
         }
       );
 
-      /* Timeline header */
+      
       if (timelineRef.current) {
         gsap.fromTo(
           timelineRef.current,
@@ -224,7 +224,7 @@ export default function AboutSection() {
         );
       }
 
-      /* Timeline items */
+      
       gsap.fromTo(
         timelineItemsRef.current.filter(Boolean),
         { x: -40, opacity: 0 },
@@ -241,7 +241,7 @@ export default function AboutSection() {
         }
       );
 
-      /* Team section */
+      
       if (teamRef.current) {
         gsap.fromTo(
           teamRef.current,
@@ -259,7 +259,7 @@ export default function AboutSection() {
         );
       }
 
-      /* Team cards */
+      
       gsap.fromTo(
         teamCardsRef.current.filter(Boolean),
         { y: 30, opacity: 0, scale: 0.95 },
@@ -277,7 +277,7 @@ export default function AboutSection() {
         }
       );
 
-      /* CTA */
+      
       if (ctaRef.current) {
         gsap.fromTo(
           ctaRef.current,
@@ -301,9 +301,9 @@ export default function AboutSection() {
 
   return (
     <div className="relative w-full bg-black overflow-hidden">
-      {/* ═══════════════ HERO ═══════════════ */}
+      
       <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Ambient glows */}
+        
         <div
           className="absolute pointer-events-none"
           style={{
@@ -328,7 +328,7 @@ export default function AboutSection() {
           }}
         />
 
-        {/* Grid lines decoration */}
+        
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -341,7 +341,7 @@ export default function AboutSection() {
         />
 
         <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center pt-24 sm:pt-32 pb-12 sm:pb-20">
-          {/* Label */}
+          
           <div className="flex items-center justify-center gap-3 mb-8" style={{ opacity: 0 }}>
             <div
               className="w-10 h-[2px]"
@@ -356,7 +356,7 @@ export default function AboutSection() {
             />
           </div>
 
-          {/* Title */}
+          
           <h1
             className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] mb-6"
             style={{ opacity: 0 }}
@@ -375,7 +375,7 @@ export default function AboutSection() {
             we share
           </h1>
 
-          {/* Subtitle */}
+          
           <p
             className="text-base sm:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed mb-12"
             style={{ opacity: 0 }}
@@ -385,7 +385,7 @@ export default function AboutSection() {
             synced moment at a time.
           </p>
 
-          {/* Decorative line */}
+          
           <div
             className="w-full max-w-md mx-auto h-[1px]"
             style={{
@@ -396,7 +396,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ STATS BAR ═══════════════ */}
+      
       <section className="relative w-full py-16">
         <div
           className="absolute inset-0"
@@ -427,7 +427,7 @@ export default function AboutSection() {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                {/* Corner accents */}
+                
                 <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/15" />
                 <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/15" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-white/15" />
@@ -452,7 +452,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ OUR STORY ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div
           className="absolute pointer-events-none"
@@ -467,7 +467,7 @@ export default function AboutSection() {
 
         <div ref={storyRef} className="relative z-10 max-w-5xl mx-auto px-6" style={{ opacity: 0 }}>
           <div className="flex flex-col lg:flex-row gap-14 items-start">
-            {/* Left — Narrative */}
+            
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-6">
                 <div
@@ -511,7 +511,7 @@ export default function AboutSection() {
               </p>
             </div>
 
-            {/* Right — Visual card */}
+            
             <div
               className="w-full lg:w-[320px] shrink-0 rounded-2xl p-8 relative overflow-hidden"
               style={{
@@ -543,7 +543,7 @@ export default function AboutSection() {
                 no matter the distance.
               </p>
 
-              {/* Mini visual bars */}
+              
               <div className="space-y-2">
                 {[
                   { label: "Sync Accuracy", width: 95 },
@@ -575,7 +575,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ VALUES ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div
           className="absolute pointer-events-none"
@@ -662,7 +662,7 @@ export default function AboutSection() {
                   <h4 className="text-base font-semibold text-white mb-2">{v.title}</h4>
                   <p className="text-xs text-white/35 leading-relaxed">{v.desc}</p>
 
-                  {/* Arrow */}
+                  
                   <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path
@@ -681,7 +681,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ TIMELINE ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div
           className="absolute pointer-events-none"
@@ -725,9 +725,9 @@ export default function AboutSection() {
             </h2>
           </div>
 
-          {/* Timeline items */}
+          
           <div className="relative">
-            {/* Vertical line */}
+            
             <div
               className="absolute left-[23px] top-0 bottom-0 w-[2px]"
               style={{
@@ -743,7 +743,7 @@ export default function AboutSection() {
                   className="relative flex gap-6 items-start pl-2"
                   style={{ opacity: 0 }}
                 >
-                  {/* Dot */}
+                  
                   <div
                     className="relative z-10 w-11 h-11 rounded-xl flex items-center justify-center text-xs font-bold text-white shrink-0"
                     style={{
@@ -754,7 +754,7 @@ export default function AboutSection() {
                     {item.year.slice(-2)}
                   </div>
 
-                  {/* Content */}
+                  
                   <div
                     className="flex-1 p-5 rounded-xl transition-all duration-300"
                     style={{
@@ -776,7 +776,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ TEAM ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div
           className="absolute pointer-events-none"
@@ -850,13 +850,13 @@ export default function AboutSection() {
                   el.style.boxShadow = "none";
                 }}
               >
-                {/* Corner accents */}
+                
                 <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/15" />
                 <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/15" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-white/15" />
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/15" />
 
-                {/* Avatar */}
+                
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-bold text-white mx-auto mb-5"
                   style={{
@@ -885,7 +885,7 @@ export default function AboutSection() {
         </div>
       </section>
 
-      {/* ═══════════════ CTA ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div ref={ctaRef} className="relative z-10 max-w-5xl mx-auto px-6" style={{ opacity: 0 }}>
           <div
@@ -895,7 +895,7 @@ export default function AboutSection() {
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
-            {/* Glow background */}
+            
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -904,7 +904,7 @@ export default function AboutSection() {
               }}
             />
 
-            {/* Corner accents */}
+            
             <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-white/15" />
             <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-white/15" />
             <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-white/15" />
@@ -954,7 +954,7 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Bottom text */}
+        
         <p className="text-center text-xs text-white/20 mt-12 tracking-wide">
           No credit card required.{" "}
           <a

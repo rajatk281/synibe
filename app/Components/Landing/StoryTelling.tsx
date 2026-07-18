@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register the ScrollTrigger plugin
+
 gsap.registerPlugin(ScrollTrigger);
 
 export default function StoryTelling() {
@@ -15,25 +15,25 @@ export default function StoryTelling() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Scroll-driven timeline
+      
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top top",       // Start when section top reaches viewport top
-          end: "+=300%",          // 3x viewport height of scroll distance
-          scrub: 1.5,             // Smooth 1.5s delay scrubbing
-          pin: true,              // Pin section during animation
+          start: "top top",       
+          end: "+=300%",          
+          scrub: 1.5,             
+          pin: true,              
         },
       });
 
-      // STEP 1: Scale text from 1 → 50 (text grows, video fills screen)
+      
       tl.to(textRef.current, {
         scale: 50,
         duration: 1,
         ease: "power2.inOut",
       }, 0);
 
-      // STEP 2: Fade out the overlay after text is large enough
+      
       tl.to(overlayRef.current, {
         opacity: 0,
         duration: 0.4,
@@ -45,7 +45,7 @@ export default function StoryTelling() {
   }, []);
 
   return (
-    // CONTAINER — full viewport, black background, hide overflow
+    
     <section className="select-none"
       ref={sectionRef}
       style={{
@@ -56,7 +56,7 @@ export default function StoryTelling() {
         background: "#000",
       }}
     >
-      {/* LAYER 1: Background video */}
+      
       <video
         style={{
           position: "absolute",
@@ -73,10 +73,10 @@ export default function StoryTelling() {
         playsInline
       />
 
-      {/* LAYER 2: Black overlay with white text */}
-      {/* mix-blend-mode: multiply makes:       */}
-      {/*   black areas → stay black (hide video) */}
-      {/*   white areas → show video through     */}
+      
+      
+      
+      
       
       <div
         ref={overlayRef}
@@ -94,7 +94,7 @@ export default function StoryTelling() {
         }}
       >
         
-        {/* White text — becomes a "window" into the video */}
+        
         <div className="text-center"
           ref={textRef}
           style={{

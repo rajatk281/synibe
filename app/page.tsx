@@ -6,7 +6,7 @@ import Hero from "./Components/Landing/Hero";
 import Navbar from "./Components/Navbar";
 import LazySection from "./Components/LazySection";
 
-// Dynamically import below-the-fold components with matching skeleton fallbacks
+
 const PhoneShowcase = dynamic(() => import("./Components/Landing/PhoneShowcase"), {
   loading: () => <div className="min-h-[1400px] lg:min-h-screen w-full" />,
 });
@@ -45,9 +45,7 @@ const page = () => {
         <StoryTelling />
       </LazySection>
       
-      {/* <LazySection className="min-h-screen">
-        <AudioAnimation />
-      </LazySection> */}
+      
       
       <LazySection className="min-h-[1200px] lg:min-h-screen">
         <HowItWorks />

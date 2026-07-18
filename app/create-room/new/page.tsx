@@ -53,10 +53,10 @@ function NewRoomContent() {
       videoUrl: videoUrl.trim(),
     });
 
-    // alert("Room creation data saved successfully")
+    
 
     setIsDeploying(true);
-    // Simulate room deployment, then navigate to the correct room type
+    
     setTimeout(() => {
       const roomId = accessHash.replace(/-/g, "").toLowerCase();
       if (mode === "listen") {
@@ -78,16 +78,16 @@ function NewRoomContent() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Ambient glows */}
+      
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
 
-          {/* ═══ LEFT COLUMN ═══ */}
+          
           <div className="flex flex-col gap-4">
-            {/* Character card */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden ">
               <div className="relative aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] overflow-hidden ">
                 <Image
@@ -98,7 +98,7 @@ function NewRoomContent() {
                   className="object-cover"
                   priority
                 />
-                {/* Bottom gradient overlay */}
+                
                 <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#0a0a0c] to-transparent" />
               </div>
 
@@ -115,7 +115,7 @@ function NewRoomContent() {
               </div>
             </div>
 
-            {/* NEW SCENE heading */}
+            
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase leading-none tracking-tight">
                 <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">New</span>
@@ -128,10 +128,10 @@ function NewRoomContent() {
             </div>
           </div>
 
-          {/* ═══ RIGHT COLUMN — Form ═══ */}
+          
           <div className="flex flex-col gap-5 pt-2">
 
-            {/* 01. Destination Name */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
               <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                 <span className="text-purple-400">01.</span> Destination Name
@@ -158,9 +158,9 @@ function NewRoomContent() {
               )}
             </div>
 
-            {/* Row: Access Hash + Visibility */}
+            
             <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-5">
-              {/* 02. Access Hash */}
+              
               <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
                 <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                   <span className="text-purple-400">02.</span> Access Hash
@@ -191,7 +191,7 @@ function NewRoomContent() {
                 </div>
               </div>
 
-              {/* 03. Visibility Protocol */}
+              
               <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
                 <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                   <span className="text-purple-400">03.</span> Visibility Protocol
@@ -221,7 +221,7 @@ function NewRoomContent() {
               </div>
             </div>
 
-            {/* 04. Participant Limit */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
@@ -270,7 +270,7 @@ function NewRoomContent() {
               </div>
             </div>
 
-            {/* 05. Video URL */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6">
               <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">
                 <span className="text-purple-400">05.</span> Video / Stream URL
@@ -305,7 +305,7 @@ function NewRoomContent() {
               </p>
             </div>
 
-            {/* Deploy Room button */}
+            
             <button
               id="deploy-room-btn"
               onClick={handleDeploy}
@@ -337,16 +337,16 @@ function NewRoomContent() {
 function NewRoomSkeleton() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Ambient glows */}
+      
       <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[200px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-pink-600/5 rounded-full blur-[180px] pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pt-24 sm:pt-32 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 items-start">
           
-          {/* LEFT COLUMN */}
+          
           <div className="flex flex-col gap-4">
-            {/* Character card skeleton */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] overflow-hidden">
               <div className="aspect-square max-h-[240px] sm:max-h-[300px] lg:max-h-[360px] bg-white/[0.02] animate-pulse" />
               <div className="px-6 pb-6 -mt-2">
@@ -358,7 +358,7 @@ function NewRoomSkeleton() {
               </div>
             </div>
 
-            {/* NEW SCENE heading skeleton */}
+            
             <div className="animate-pulse">
               <div className="h-8 sm:h-10 md:h-12 lg:h-14 bg-white/[0.04] rounded-lg w-1/2" />
               <div className="h-8 sm:h-10 md:h-12 lg:h-14 bg-white/[0.04] rounded-lg w-2/3 mt-2" />
@@ -367,23 +367,23 @@ function NewRoomSkeleton() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
+          
           <div className="flex flex-col gap-5 pt-2">
-            {/* 01. Destination Name skeleton */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[126px] flex flex-col justify-between">
               <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
               <div className="h-[50px] bg-white/[0.02] border border-white/[0.08] rounded-xl animate-pulse" />
             </div>
 
-            {/* Row: Access Hash + Visibility */}
+            
             <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-5">
-              {/* 02. Access Hash skeleton */}
+              
               <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[116px] flex flex-col justify-between">
                 <div className="h-3 bg-white/[0.08] w-24 rounded animate-pulse" />
                 <div className="h-10 bg-white/[0.02] rounded-md w-3/4 animate-pulse" />
               </div>
 
-              {/* 03. Visibility Protocol skeleton */}
+              
               <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[116px] flex flex-col justify-between">
                 <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
                 <div className="flex gap-2 mt-1">
@@ -393,7 +393,7 @@ function NewRoomSkeleton() {
               </div>
             </div>
 
-            {/* 04. Participant Limit skeleton */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[122px] flex flex-col justify-between">
               <div className="flex justify-between items-center">
                 <div className="h-3 bg-white/[0.08] w-32 rounded animate-pulse" />
@@ -406,7 +406,7 @@ function NewRoomSkeleton() {
               </div>
             </div>
 
-            {/* 05. Video URL skeleton */}
+            
             <div className="rounded-2xl border border-white/[0.06] bg-[#0a0a0c] p-6 h-[148px] flex flex-col justify-between">
               <div className="h-3 bg-white/[0.08] w-36 rounded animate-pulse" />
               <div className="flex gap-3 my-1">
@@ -416,7 +416,7 @@ function NewRoomSkeleton() {
               <div className="h-2.5 bg-white/[0.04] w-48 rounded animate-pulse" />
             </div>
 
-            {/* Deploy Room button skeleton */}
+            
             <div className="h-[60px] bg-white/[0.02] rounded-2xl animate-pulse" />
           </div>
 

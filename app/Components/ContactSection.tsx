@@ -17,7 +17,7 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Contact Methods ─── */
+
 const contactMethods = [
   {
     icon: Mail,
@@ -42,14 +42,14 @@ const contactMethods = [
   },
 ];
 
-/* ─── Social Links ─── */
+
 const socials = [
   { icon: AtSign, name: "Twitter", handle: "@synibe_app" },
   { icon: Code2, name: "GitHub", handle: "github.com/synibe" },
   { icon: MessageSquare, name: "Discord", handle: "discord.gg/synibe" },
 ];
 
-/* ─── FAQ ─── */
+
 const faqs = [
   {
     q: "How quickly will I get a response?",
@@ -69,7 +69,7 @@ const faqs = [
   },
 ];
 
-/* ─── Component ─── */
+
 export default function ContactSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ export default function ContactSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      /* Hero entrance */
+      
       if (heroRef.current) {
         gsap.fromTo(
           heroRef.current.children,
@@ -97,7 +97,7 @@ export default function ContactSection() {
         );
       }
 
-      /* Form entrance */
+      
       if (formRef.current) {
         gsap.fromTo(
           formRef.current,
@@ -112,7 +112,7 @@ export default function ContactSection() {
         );
       }
 
-      /* Contact methods stagger */
+      
       gsap.fromTo(
         methodsRef.current.filter(Boolean),
         { y: 40, opacity: 0 },
@@ -129,7 +129,7 @@ export default function ContactSection() {
         }
       );
 
-      /* Socials */
+      
       if (socialsRef.current) {
         gsap.fromTo(
           socialsRef.current,
@@ -147,7 +147,7 @@ export default function ContactSection() {
         );
       }
 
-      /* FAQ header */
+      
       if (faqHeaderRef.current) {
         gsap.fromTo(
           faqHeaderRef.current,
@@ -165,7 +165,7 @@ export default function ContactSection() {
         );
       }
 
-      /* FAQ items */
+      
       gsap.fromTo(
         faqItemsRef.current.filter(Boolean),
         { y: 30, opacity: 0 },
@@ -212,9 +212,9 @@ export default function ContactSection() {
   return (
  
     <div className="relative w-full bg-black overflow-hidden">
-      {/* ═══════════════ HERO + FORM ═══════════════ */}
+      
       <section className="relative w-full min-h-screen overflow-hidden">
-        {/* Ambient glows */}
+        
         <div
           className="absolute pointer-events-none"
           style={{
@@ -239,7 +239,7 @@ export default function ContactSection() {
           }}
         />
 
-        {/* Grid lines */}
+        
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -253,9 +253,9 @@ export default function ContactSection() {
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-20">
           <div className="flex flex-col lg:flex-row gap-16 items-start">
-            {/* Left — Hero text */}
+            
             <div ref={heroRef} className="flex-1 min-w-0 lg:pt-8">
-              {/* Label */}
+              
               <div className="flex items-center gap-3 mb-8" style={{ opacity: 0 }}>
                 <div
                   className="w-1 h-6 rounded-full"
@@ -272,7 +272,7 @@ export default function ContactSection() {
                 </span>
               </div>
 
-              {/* Title */}
+              
               <h1
                 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-6"
                 style={{ opacity: 0 }}
@@ -292,7 +292,7 @@ export default function ContactSection() {
                 </span>
               </h1>
 
-              {/* Subtitle */}
+              
               <p
                 className="text-sm sm:text-base text-white/40 max-w-md leading-relaxed mb-10"
                 style={{ opacity: 0 }}
@@ -301,7 +301,7 @@ export default function ContactSection() {
                 is standing by to translate your vision into reality.
               </p>
 
-              {/* Quick info cards */}
+              
               <div className="flex flex-wrap gap-4" style={{ opacity: 0 }}>
                 <div
                   className="flex items-center gap-3 px-4 py-3 rounded-xl"
@@ -358,7 +358,7 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* Right — Contact Form */}
+            
             <div
               ref={formRef}
               className="w-full lg:w-[480px] shrink-0 rounded-2xl p-8 sm:p-10 relative"
@@ -369,13 +369,13 @@ export default function ContactSection() {
                 opacity: 0,
               }}
             >
-              {/* Corner accents */}
+              
               <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-white/15" />
               <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-white/15" />
               <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-white/15" />
               <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-white/15" />
 
-              {/* Glow */}
+              
               <div
                 className="absolute inset-0 pointer-events-none rounded-2xl"
                 style={{
@@ -385,7 +385,7 @@ export default function ContactSection() {
               />
 
               <form ref={form} onSubmit={sendEmail} className="relative z-10 space-y-6">
-                {/* Name + Email row */}
+                
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
@@ -411,7 +411,7 @@ export default function ContactSection() {
                   </div>
                 </div>
 
-                {/* Subject */}
+                
                 <div>
                   <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
                     Signal Type
@@ -431,7 +431,7 @@ export default function ContactSection() {
                   </select>
                 </div>
 
-                {/* Message */}
+                
                 <div>
                   <label className="block text-[10px] tracking-[0.2em] uppercase text-white/30 mb-2 font-medium">
                     Message
@@ -444,7 +444,7 @@ export default function ContactSection() {
                   />
                 </div>
 
-                {/* Submit */}
+                
       
                   <input
                     type="submit"
@@ -458,7 +458,7 @@ export default function ContactSection() {
         </div>
       </section>
 
-      {/* ═══════════════ CONTACT METHODS ═══════════════ */}
+      
       <section className="relative w-full py-24">
         <div
           className="absolute pointer-events-none"
@@ -528,13 +528,13 @@ export default function ContactSection() {
                     el.style.boxShadow = "none";
                   }}
                 >
-                  {/* Corner accents */}
+                  
                   <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/15" />
                   <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/15" />
                   <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-white/15" />
                   <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/15" />
 
-                  {/* Tag */}
+                  
                   <div
                     className="inline-block px-3 py-1 rounded-full text-[10px] font-medium tracking-wider uppercase mb-5"
                     style={{
@@ -566,7 +566,7 @@ export default function ContactSection() {
                     {method.detail}
                   </div>
 
-                  {/* Arrow */}
+                  
                   <div className="absolute top-7 right-7 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       <path
@@ -585,7 +585,7 @@ export default function ContactSection() {
         </div>
       </section>
 
-      {/* ═══════════════ SOCIALS BAR ═══════════════ */}
+      
       <section className="relative w-full py-16">
         <div ref={socialsRef} className="relative z-10 max-w-5xl mx-auto px-6" style={{ opacity: 0 }}>
           <div
@@ -634,7 +634,7 @@ export default function ContactSection() {
         </div>
       </section>
 
-      {/* ═══════════════ FAQ ═══════════════ */}
+      
       <section className="relative w-full py-28">
         <div
           className="absolute pointer-events-none"
@@ -716,7 +716,7 @@ export default function ContactSection() {
         </div>
       </section>
 
-      {/* ═══════════════ BOTTOM SPACER ═══════════════ */}
+      
       <div className="relative w-full py-16">
         <div
           className="w-full max-w-md mx-auto h-[1px]"

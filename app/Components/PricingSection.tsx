@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Plan Data ─── */
+
 const plans = [
   {
     id: "free",
@@ -89,7 +89,7 @@ const plans = [
   },
 ];
 
-/* ─── Comparison Data ─── */
+
 const comparisonCategories = [
   {
     name: "Streaming",
@@ -120,7 +120,7 @@ const comparisonCategories = [
   },
 ];
 
-/* ─── Perks Data ─── */
+
 const perks = [
   {
     icon: MonitorPlay,
@@ -144,7 +144,7 @@ const perks = [
   },
 ];
 
-/* ─── FAQ Data ─── */
+
 const pricingFaqs = [
   {
     q: "Can I switch plans at any time?",
@@ -168,7 +168,7 @@ const pricingFaqs = [
   },
 ];
 
-/* ─── Component ─── */
+
 export default function PricingSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
@@ -185,7 +185,7 @@ export default function PricingSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      /* Hero entrance */
+      
       if (heroRef.current) {
         gsap.fromTo(
           heroRef.current.children,
@@ -201,7 +201,7 @@ export default function PricingSection() {
         );
       }
 
-      /* Toggle */
+      
       if (toggleRef.current) {
         gsap.fromTo(
           toggleRef.current,
@@ -216,7 +216,7 @@ export default function PricingSection() {
         );
       }
 
-      /* Cards stagger */
+      
       gsap.fromTo(
         cardsRef.current.filter(Boolean),
         { y: 50, opacity: 0, scale: 0.95 },
@@ -231,7 +231,7 @@ export default function PricingSection() {
         }
       );
 
-      /* Perks header */
+      
       if (perksHeaderRef.current) {
         gsap.fromTo(
           perksHeaderRef.current,
@@ -246,7 +246,7 @@ export default function PricingSection() {
         );
       }
 
-      /* Perk items */
+      
       gsap.fromTo(
         perksRef.current.filter(Boolean),
         { y: 30, opacity: 0 },
@@ -260,7 +260,7 @@ export default function PricingSection() {
         }
       );
 
-      /* Comparison table */
+      
       if (comparisonRef.current) {
         gsap.fromTo(
           comparisonRef.current,
@@ -275,7 +275,7 @@ export default function PricingSection() {
         );
       }
 
-      /* FAQ header */
+      
       if (faqHeaderRef.current) {
         gsap.fromTo(
           faqHeaderRef.current,
@@ -290,7 +290,7 @@ export default function PricingSection() {
         );
       }
 
-      /* FAQ items */
+      
       gsap.fromTo(
         faqItemsRef.current.filter(Boolean),
         { y: 25, opacity: 0 },
@@ -304,7 +304,7 @@ export default function PricingSection() {
         }
       );
 
-      /* CTA */
+      
       if (ctaRef.current) {
         gsap.fromTo(
           ctaRef.current,
@@ -339,7 +339,7 @@ export default function PricingSection() {
     return;
   }
    
-    if (Number(amount) === 0) return; // Free plan, no payment needed
+    if (Number(amount) === 0) return; 
 
     const res = await fetch("/api/CreateOrder",  {
       method: "POST",
@@ -380,7 +380,7 @@ export default function PricingSection() {
           const data = await res.json();
           if (data.isOk) {
             console.log("Payment verification successful");
-            // Add your success logic here (e.g. redirect, toast notification)
+            
             alert("Payment successful!");
           } else {
             console.error("Payment verification failed:", data.message);
@@ -400,9 +400,9 @@ export default function PricingSection() {
 
   return (
     <div className="relative w-full bg-black overflow-hidden select-none">
-      {/* ═══════════════ HERO ═══════════════ */}
+      
       <section className="relative w-full pt-32 pb-10 overflow-hidden">
-        {/* Ambient glows */}
+        
         <div
           className="absolute pointer-events-none"  
           style={{
@@ -427,7 +427,7 @@ export default function PricingSection() {
           }}
         />
 
-        {/* Grid lines */}
+        
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -440,7 +440,7 @@ export default function PricingSection() {
         />
 
         <div ref={heroRef} className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          {/* Label */}
+          
           <div className="flex items-center justify-center gap-3 mb-8" style={{ opacity: 0 }}>
             <div
               className="w-10 h-[2px]"
@@ -455,7 +455,7 @@ export default function PricingSection() {
             />
           </div>
 
-          {/* Title */}
+          
           <h1
             className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6"
             style={{ opacity: 0 }}
@@ -472,7 +472,7 @@ export default function PricingSection() {
             </span>
           </h1>
 
-          {/* Subtitle */}
+          
           <p
             className="text-base sm:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed mb-10"
             style={{ opacity: 0 }}
@@ -482,7 +482,7 @@ export default function PricingSection() {
           </p>
         </div>
 
-        {/* Billing toggle */}
+        
         <div
           ref={toggleRef}
           className="relative z-10 flex flex-wrap items-center justify-center gap-4 mb-16"
@@ -523,7 +523,7 @@ export default function PricingSection() {
         </div>
       </section>
 
-      {/* ═══════════════ PRICING CARDS ═══════════════ */}
+      
       <section className="relative w-full pb-18">
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
@@ -569,13 +569,13 @@ export default function PricingSection() {
                     }
                   }}
                 >
-                  {/* Corner accents */}
+                  
                   <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/15" />
                   <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/15" />
                   <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-white/15" />
                   <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/15" />
 
-                  {/* Popular badge */}
+                  
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <div
@@ -590,7 +590,7 @@ export default function PricingSection() {
                     </div>
                   )}
 
-                  {/* Plan header */}
+                  
                   <div className="mb-6 pt-2">
                     <div className="flex items-center gap-3 mb-3">
                       <div
@@ -606,7 +606,7 @@ export default function PricingSection() {
                     </div>
                   </div>
 
-                  {/* Price */}
+                  
                   <div className="mb-8">
                     <div className="flex items-baseline gap-1">
                       <span className="text-xs text-white/40 self-start mt-2">$</span>
@@ -633,7 +633,7 @@ export default function PricingSection() {
                     )}
                   </div>
 
-                  {/* Divider */}
+                  
                   <div
                     className="w-full h-[1px] mb-6"
                     style={{
@@ -643,7 +643,7 @@ export default function PricingSection() {
                     }}
                   />
 
-                  {/* Features */}
+                  
                   <div className="space-y-3 flex-1">
                     {plan.features.map((f, fi) => (
                       <div key={fi} className="flex items-center gap-3">
@@ -666,7 +666,7 @@ export default function PricingSection() {
                     ))}
                   </div>
 
-                  {/* CTA Button */}
+                  
                   <div onClick={()=>{createOrder(plan.price, session)}} className="mt-8 cursor-pointer">
                     <div
                       className={`group/btn w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-[1.03] ${plan.popular ? "text-white" : "text-white/70 hover:text-white"}`}
@@ -693,7 +693,7 @@ export default function PricingSection() {
         </div>
       </section>
 
-      {/* ═══════════════ PERKS ═══════════════ */}
+      
       <section className="relative w-full pb-12">
         <div
           className="absolute pointer-events-none"
@@ -781,7 +781,7 @@ export default function PricingSection() {
         </div>
       </section>
 
-      {/* ═══════════════ COMPARISON TABLE ═══════════════ */}
+      
       <section className="relative w-full pb-12">
         <div
           className="absolute pointer-events-none"
@@ -823,7 +823,7 @@ export default function PricingSection() {
               </span>
             </h2>
 
-            {/* Table — horizontally scrollable on mobile */}
+            
             <div className="overflow-x-auto -mx-2 px-2">
             <div
               className="rounded-2xl overflow-hidden min-w-[600px]"
@@ -832,7 +832,7 @@ export default function PricingSection() {
                 border: "1px solid rgba(255,255,255,0.06)",
               }}
             >
-              {/* Header */}
+              
               <div
                 className="grid grid-cols-4 gap-4 px-6 py-5"
                 style={{
@@ -863,10 +863,10 @@ export default function PricingSection() {
                 </div>
               </div>
 
-              {/* Rows */}
+              
               {comparisonCategories.map((cat, ci) => (
                 <div key={ci}>
-                  {/* Category label */}
+                  
                   <div
                     className="px-6 py-3"
                     style={{
@@ -900,7 +900,7 @@ export default function PricingSection() {
         </div>
       </section>
 
-      {/* ═══════════════ FAQ ═══════════════ */}
+      
       <section className="relative w-full">
         <div
           className="absolute pointer-events-none"
@@ -982,7 +982,7 @@ export default function PricingSection() {
         </div>
       </section>
 
-      {/* ═══════════════ CTA ═══════════════ */}
+      
       <section className="relative w-full">
         <div ref={ctaRef} className="relative z-10 max-w-5xl mx-auto px-6" style={{ opacity: 0 }}>
           <div
@@ -992,7 +992,7 @@ export default function PricingSection() {
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
-            {/* Glow */}
+            
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -1001,7 +1001,7 @@ export default function PricingSection() {
               }}
             />
 
-            {/* Corner accents */}
+            
             <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-white/15" />
             <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-white/15" />
             <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-white/15" />
@@ -1053,7 +1053,7 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Bottom text */}
+        
         <p className="text-center text-xs text-white/20 mt-12 tracking-wide">
           All prices in USD. Taxes may apply.{" "}
           <Link
